@@ -1,0 +1,34 @@
+<section class="home">
+  <div class="hero">
+    <span class="eyebrow">Panel de control</span>
+    <h1>CHsistem</h1>
+    <p>Base técnica conectada: Angular, Express y MongoDB.</p>
+  </div>
+
+  <div class="status-card">
+    <div class="status-header">
+      <span
+        class="dot"
+        [class.ok]="health()?.status === 'ok'"
+        [class.fail]="error() !== null"
+      ></span>
+      <h2>Estado del sistema</h2>
+    </div>
+
+    @if (loading()) {
+      <p class="muted">Consultando API...</p>
+    } @else if (error()) {
+      <p class="error">{{ error() }}</p>
+    } @else if (health(); as h) {
+      <ul>
+        <li><span>API</span><strong>{{ h.status }}</strong></li>
+        <li><span>Base de datos</span><strong>{{ h.database }}</strong></li>
+        <li><span>Uptime</span><strong>{{ h.uptime.toFixed(0) }} s</strong></li>
+      </ul>
+    }
+
+    <button type="button" (click)="checkStatus()" [disabled]="loading()">
+      Actualizar
+    </button>
+  </div>
+</section>
