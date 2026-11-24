@@ -3,17 +3,13 @@
   gap: 1.5rem;
 }
 
-.eyebrow {
-  display: inline-block;
-  margin-bottom: 0.6rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
-  background: #eff6ff;
-  color: #1d4ed8;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+.hero__logo {
+  display: block;
+  width: min(100%, 520px);
+  height: auto;
+  margin-bottom: 1.25rem;
+  border-radius: 1rem;
+  box-shadow: 0 24px 50px -28px rgb(0 0 0 / 0.55);
 }
 
 .hero h1 {
@@ -95,14 +91,14 @@
   padding: 0.6rem 1rem;
   border: 0;
   border-radius: 0.6rem;
-  background: #2563eb;
+  background: #b8860b;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
 }
 
 .status-card button:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: #9a7209;
 }
 
 .status-card button:disabled {

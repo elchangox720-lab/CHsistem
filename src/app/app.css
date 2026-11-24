@@ -32,15 +32,11 @@
   text-decoration: none;
 }
 
-.brand__mark {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.6rem;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: #fff;
-  font-size: 0.8rem;
+.brand__logo {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .nav a {
@@ -54,8 +50,8 @@
 
 .nav a:hover,
 .nav a.is-active {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: #fbf3d9;
+  color: #8a6d1d;
 }
 
 .page {
