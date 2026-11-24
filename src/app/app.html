@@ -10,22 +10,63 @@
       />
       <span>{{ title() }}</span>
     </a>
-    <nav class="nav">
-      <a
-        routerLink="/"
-        routerLinkActive="is-active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        Inicio
-      </a>
-    </nav>
+
+    @if (auth.isAuthenticated()) {
+      <nav class="nav" aria-label="Navegación principal">
+        <a
+          routerLink="/"
+          routerLinkActive="is-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Panel
+        </a>
+        <a routerLink="/clientes" routerLinkActive="is-active">Clientes</a>
+        <a routerLink="/productos" routerLinkActive="is-active">Productos</a>
+        <a routerLink="/inventario" routerLinkActive="is-active">Inventario</a>
+        <a routerLink="/ventas" routerLinkActive="is-active">Ventas</a>
+        @if (auth.isAdmin()) {
+          <a routerLink="/usuarios" routerLinkActive="is-active">Usuarios</a>
+        }
+      </nav>
+
+      <div class="user">
+        <div class="user__info">
+          <strong>{{ auth.user()?.name }}</strong>
+          <span>{{ roleLabel(auth.user()?.role) }}</span>
+        </div>
+        <button
+          type="button"
+          class="btn btn--ghost btn--sm"
+          (click)="logout()"
+        >
+          Salir
+        </button>
+      </div>
+    } @else {
+      <a class="login-link" routerLink="/login">Iniciar sesión</a>
+    }
   </div>
 </header>
 
-<main class="page">
+<main class="shell">
   <router-outlet />
 </main>
 
-<footer class="footer">
-  <span>{{ title() }} · Angular + Express + MongoDB</span>
-</footer>
+<div class="toast-container" aria-live="polite">
+  @for (toast of toasts(); track toast.id) {
+    <div
+      class="toast"
+      [class.toast--error]="toast.type === 'error'"
+      [class.toast--success]="toast.type === 'success'"
+    >
+      <span>{{ toast.message }}</span>
+      <button
+        type="button"
+        (click)="dismissToast(toast.id)"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+    </div>
+  }
+</div>

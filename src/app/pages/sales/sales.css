@@ -1,0 +1,23 @@
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.totals {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  min-width: 220px;
+}
+
+.totals .grand {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 1.1rem;
+  font-weight: 800;
+}

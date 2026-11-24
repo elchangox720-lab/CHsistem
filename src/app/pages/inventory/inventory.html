@@ -1,0 +1,190 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Inventario</h1>
+      <p>Entradas, salidas y ajustes de stock.</p>
+    </div>
+  </header>
+
+  <div class="grid-2">
+    <section class="card card--pad">
+      <h2>Ajuste de inventario</h2>
+
+      @if (canManage()) {
+        <form class="form-grid" [formGroup]="form" (ngSubmit)="adjust()">
+          <div class="field span-2">
+            <label for="inventory-product">Producto</label>
+            <select id="inventory-product" formControlName="productId">
+              <option value="">Selecciona un producto</option>
+              @for (product of products(); track product._id) {
+                <option [value]="product._id">
+                  {{ product.name }} · {{ product.sku }} · Stock:
+                  {{ product.stock }}
+                </option>
+              }
+            </select>
+            @if (selectedProduct; as product) {
+              <small class="muted">Stock actual: {{ product.stock }}</small>
+            }
+          </div>
+          <div class="field">
+            <label for="inventory-type">Movimiento</label>
+            <select id="inventory-type" formControlName="type">
+              <option value="entrada">Entrada</option>
+              <option value="salida">Salida</option>
+              <option value="ajuste">Ajuste a nuevo stock</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="inventory-quantity">{{ quantityLabel }}</label>
+            <input
+              id="inventory-quantity"
+              type="number"
+              min="0"
+              step="1"
+              formControlName="quantity"
+            />
+          </div>
+          <div class="field span-2">
+            <label for="inventory-reason">Motivo</label>
+            <input
+              id="inventory-reason"
+              formControlName="reason"
+              placeholder="Compra, merma, corrección..."
+            />
+          </div>
+          <div class="form-actions span-2">
+            <button
+              type="submit"
+              class="btn btn--primary"
+              [disabled]="saving() || form.invalid"
+            >
+              {{ saving() ? 'Aplicando...' : 'Aplicar movimiento' }}
+            </button>
+          </div>
+        </form>
+      } @else {
+        <p class="muted">
+          Tu rol permite consultar el inventario, pero no modificarlo.
+        </p>
+      }
+    </section>
+
+    <section class="card">
+      <div class="card__header">
+        <h2>Alertas de stock</h2>
+        <a class="muted" routerLink="/productos">Productos</a>
+      </div>
+      @if (lowStockProducts().length > 0) {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="right">Stock</th>
+                <th class="right">Mínimo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of lowStockProducts(); track product._id) {
+                <tr>
+                  <td>
+                    <strong>{{ product.name }}</strong>
+                    <div class="muted">{{ product.sku }}</div>
+                  </td>
+                  <td class="right">
+                    <span class="badge badge--warning">
+                      {{ product.stock }}
+                    </span>
+                  </td>
+                  <td class="right">{{ product.minStock }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">Sin alertas de stock.</div>
+      }
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="toolbar">
+      <select (change)="onProductFilter($event)">
+        <option value="">Todos los productos</option>
+        @for (product of products(); track product._id) {
+          <option [value]="product._id">{{ product.name }}</option>
+        }
+      </select>
+      <select (change)="onTypeFilter($event)">
+        <option value="all">Todos los movimientos</option>
+        <option value="entrada">Entradas</option>
+        <option value="salida">Salidas</option>
+        <option value="ajuste">Ajustes</option>
+      </select>
+      <span class="spacer"></span>
+      <span class="muted">{{ total() }} movimiento(s)</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-empty">Cargando movimientos...</div>
+    } @else if (movements().length > 0) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Producto</th>
+              <th>Movimiento</th>
+              <th class="right">Cantidad</th>
+              <th class="right">Stock</th>
+              <th>Motivo</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (movement of movements(); track movement._id) {
+              <tr>
+                <td>{{ movement.createdAt | dateEs:'datetime' }}</td>
+                <td>{{ productName(movement) }}</td>
+                <td>
+                  <span [class]="typeClass(movement.type)">
+                    {{ typeLabel(movement.type) }}
+                  </span>
+                </td>
+                <td class="right">{{ movementDelta(movement) }}</td>
+                <td class="right">
+                  {{ movement.previousStock }} → {{ movement.newStock }}
+                </td>
+                <td>{{ movement.reason || '—' }}</td>
+                <td>{{ userName(movement) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ page() }} de {{ pages() }}</span>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() >= pages()"
+          (click)="goToPage(page() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    } @else {
+      <div class="table-empty">No hay movimientos registrados.</div>
+    }
+  </section>
+</section>

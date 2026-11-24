@@ -1,0 +1,158 @@
+<form class="sale-layout" [formGroup]="form" (ngSubmit)="submit()">
+  <section class="card card--pad">
+    <h1>Nueva venta</h1>
+    <p class="muted">Selecciona el cliente y agrega los productos.</p>
+
+    @if (loading()) {
+      <p class="muted">Cargando clientes y productos...</p>
+    }
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="sale-client">Cliente</label>
+        <select id="sale-client" formControlName="clientId">
+          <option value="">Selecciona un cliente</option>
+          @for (client of clients(); track client._id) {
+            <option [value]="client._id">
+              {{ client.name }}{{ client.taxId ? ' · ' + client.taxId : '' }}
+            </option>
+          }
+        </select>
+        @if (!loading() && clients().length === 0) {
+          <small class="muted">
+            No hay clientes activos.
+            <a routerLink="/clientes" [queryParams]="{ nuevo: 1 }">
+              Crear cliente
+            </a>
+          </small>
+        }
+      </div>
+      <div class="field">
+        <label for="sale-status">Estado</label>
+        <select id="sale-status" formControlName="status">
+          <option value="pagada">Pagada</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sale-items" formArrayName="items">
+      <div class="sale-items__header">
+        <h2>Productos</h2>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          (click)="addItem()"
+        >
+          Agregar producto
+        </button>
+      </div>
+
+      @for (item of items.controls; track item; let i = $index) {
+        <div class="sale-line" [formGroupName]="i">
+          <div class="field sale-line__product">
+            <label>Producto</label>
+            <select formControlName="productId" (change)="onProductChange(i)">
+              <option value="">Selecciona un producto</option>
+              @for (product of products(); track product._id) {
+                <option [value]="product._id">
+                  {{ product.name }} · {{ product.sku }} · Stock:
+                  {{ product.stock }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label>Cantidad</label>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              formControlName="quantity"
+            />
+          </div>
+          <div class="field">
+            <label>Precio</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              formControlName="unitPrice"
+            />
+          </div>
+          <div class="field">
+            <label>Subtotal</label>
+            <div class="sale-line__amount">{{ lineSubtotal(i) | money }}</div>
+          </div>
+          <button
+            type="button"
+            class="icon-btn sale-line__remove"
+            aria-label="Quitar producto"
+            [disabled]="items.length === 1"
+            (click)="removeItem(i)"
+          >
+            ×
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (!loading() && products().length === 0) {
+      <p class="muted">
+        No hay productos activos.
+        <a routerLink="/productos" [queryParams]="{ nuevo: 1 }">
+          Crear producto
+        </a>
+      </p>
+    }
+
+    <div class="field">
+      <label for="sale-notes">Notas</label>
+      <textarea id="sale-notes" formControlName="notes"></textarea>
+    </div>
+  </section>
+
+  <aside class="card card--pad sale-summary">
+    <h2>Resumen</h2>
+
+    <div class="field">
+      <label for="sale-tax">Impuesto (%)</label>
+      <input
+        id="sale-tax"
+        type="number"
+        min="0"
+        max="100"
+        step="0.01"
+        formControlName="taxRate"
+      />
+    </div>
+
+    <div class="totals">
+      <div>
+        <span>Subtotal</span>
+        <strong>{{ subtotal | money }}</strong>
+      </div>
+      <div>
+        <span>Impuesto</span>
+        <strong>{{ tax | money }}</strong>
+      </div>
+      <div class="grand">
+        <span>Total</span>
+        <strong>{{ total | money }}</strong>
+      </div>
+    </div>
+
+    @if (error()) {
+      <p class="error-text">{{ error() }}</p>
+    }
+
+    <button
+      type="submit"
+      class="btn btn--primary"
+      [disabled]="saving() || loading() || form.invalid"
+    >
+      {{ saving() ? 'Registrando...' : 'Registrar venta' }}
+    </button>
+    <a class="btn btn--secondary" routerLink="/ventas">Cancelar</a>
+  </aside>
+</form>

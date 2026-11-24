@@ -1,0 +1,163 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Hola, {{ auth.user()?.name }}</h1>
+      <p>Resumen de tu operación en CHsistem.</p>
+    </div>
+    <div class="inline">
+      @if (auth.hasRole('admin', 'vendedor')) {
+        <a class="btn btn--primary" routerLink="/ventas/nueva">
+          Nueva venta
+        </a>
+        <a
+          class="btn btn--secondary"
+          routerLink="/clientes"
+          [queryParams]="{ nuevo: 1 }"
+        >
+          Nuevo cliente
+        </a>
+      }
+      @if (auth.hasRole('admin', 'inventario')) {
+        <a
+          class="btn btn--secondary"
+          routerLink="/productos"
+          [queryParams]="{ nuevo: 1 }"
+        >
+          Nuevo producto
+        </a>
+      }
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="card card--pad muted">Cargando panel...</div>
+  } @else if (summary(); as s) {
+    <div class="stat-grid">
+      <div class="card stat-card">
+        <span class="stat-card__label">Clientes activos</span>
+        <span class="stat-card__value">{{ s.clients }}</span>
+        <a class="stat-card__hint" routerLink="/clientes">Ver clientes</a>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-card__label">Productos activos</span>
+        <span class="stat-card__value">{{ s.products }}</span>
+        <a class="stat-card__hint" routerLink="/productos">Ver productos</a>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-card__label">Stock bajo</span>
+        <span class="stat-card__value" [class.text-danger]="s.lowStock > 0">
+          {{ s.lowStock }}
+        </span>
+        <a class="stat-card__hint" routerLink="/inventario">
+          Revisar inventario
+        </a>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-card__label">Ventas de hoy</span>
+        <span class="stat-card__value">{{ s.salesToday.total | money }}</span>
+        <span class="stat-card__hint">{{ s.salesToday.count }} venta(s)</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-card__label">Ventas del mes</span>
+        <span class="stat-card__value">{{ s.salesMonth.total | money }}</span>
+        <span class="stat-card__hint">{{ s.salesMonth.count }} venta(s)</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-card__label">Usuarios activos</span>
+        <span class="stat-card__value">{{ s.users }}</span>
+        <span class="stat-card__hint">Equipo con acceso</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <section class="card">
+        <div class="card__header">
+          <h2>Últimas ventas</h2>
+          <a class="muted" routerLink="/ventas">Ver todas</a>
+        </div>
+        @if (s.recentSales.length > 0) {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Factura</th>
+                  <th>Cliente</th>
+                  <th>Fecha</th>
+                  <th class="right">Total</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sale of s.recentSales; track sale._id) {
+                  <tr>
+                    <td>{{ sale.invoiceNumber }}</td>
+                    <td>{{ clientName(sale) }}</td>
+                    <td>{{ sale.createdAt | dateEs }}</td>
+                    <td class="right">{{ sale.total | money }}</td>
+                    <td>
+                      <span [class]="statusClass(sale.status)">
+                        {{ sale.status }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-state">Aún no hay ventas registradas.</div>
+        }
+      </section>
+
+      <section class="card">
+        <div class="card__header">
+          <h2>Productos con stock bajo</h2>
+          <a class="muted" routerLink="/inventario">Gestionar</a>
+        </div>
+        @if (s.lowStockProducts.length > 0) {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>SKU</th>
+                  <th class="right">Stock</th>
+                  <th class="right">Mínimo</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (product of s.lowStockProducts; track product._id) {
+                  <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.sku }}</td>
+                    <td class="right">
+                      <span class="badge badge--warning">
+                        {{ product.stock }}
+                      </span>
+                    </td>
+                    <td class="right">{{ product.minStock }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-state">
+            Todo el inventario está por encima del mínimo.
+          </div>
+        }
+      </section>
+    </div>
+  } @else {
+    <div class="card card--pad empty-state">
+      <span>No se pudo cargar el panel.</span>
+      <button
+        type="button"
+        class="btn btn--secondary btn--sm"
+        (click)="load()"
+      >
+        Reintentar
+      </button>
+    </div>
+  }
+</section>

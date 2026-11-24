@@ -1,0 +1,117 @@
+<section class="auth">
+  <div class="auth__visual">
+    <img
+      class="auth__logo"
+      src="brand-logo.jpg"
+      alt="CHsistems — Tecnología sin límites"
+    />
+    <h1>Gestión comercial sin límites</h1>
+    <p>
+      Administra clientes, productos, inventario y ventas desde un solo panel.
+    </p>
+    <ul class="auth__features">
+      <li>Control de inventario en tiempo real</li>
+      <li>Ventas y facturación con roles</li>
+      <li>Métricas claras para tu negocio</li>
+    </ul>
+  </div>
+
+  <div class="auth__card card card--pad">
+    @if (checking()) {
+      <p class="muted">Verificando configuración...</p>
+    } @else if (needsSetup()) {
+      <h2>Configuración inicial</h2>
+      <p class="muted">Crea la cuenta de administrador para empezar.</p>
+
+      <form
+        class="auth__form"
+        [formGroup]="setupForm"
+        (ngSubmit)="submitSetup()"
+      >
+        <div class="field">
+          <label for="setup-name">Nombre</label>
+          <input id="setup-name" formControlName="name" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="setup-email">Correo</label>
+          <input
+            id="setup-email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+          />
+        </div>
+        <div class="field">
+          <label for="setup-password">Contraseña</label>
+          <input
+            id="setup-password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+          />
+        </div>
+        <div class="field">
+          <label for="setup-confirm">Confirmar contraseña</label>
+          <input
+            id="setup-confirm"
+            type="password"
+            formControlName="confirm"
+            autocomplete="new-password"
+          />
+        </div>
+
+        @if (error()) {
+          <p class="error-text">{{ error() }}</p>
+        }
+
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="loading() || setupForm.invalid"
+        >
+          {{ loading() ? 'Creando...' : 'Crear administrador' }}
+        </button>
+      </form>
+    } @else {
+      <h2>Iniciar sesión</h2>
+      <p class="muted">Accede al panel de CHsistem.</p>
+
+      <form
+        class="auth__form"
+        [formGroup]="loginForm"
+        (ngSubmit)="submitLogin()"
+      >
+        <div class="field">
+          <label for="login-email">Correo</label>
+          <input
+            id="login-email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+          />
+        </div>
+        <div class="field">
+          <label for="login-password">Contraseña</label>
+          <input
+            id="login-password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+        </div>
+
+        @if (error()) {
+          <p class="error-text">{{ error() }}</p>
+        }
+
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="loading() || loginForm.invalid"
+        >
+          {{ loading() ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+    }
+  </div>
+</section>

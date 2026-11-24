@@ -1,0 +1,200 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Ventas</h1>
+      <p>{{ total() }} venta(s) registradas.</p>
+    </div>
+    @if (canSell()) {
+      <a class="btn btn--primary" routerLink="/ventas/nueva">Nueva venta</a>
+    }
+  </header>
+
+  <section class="card">
+    <div class="toolbar">
+      <input
+        type="search"
+        placeholder="Buscar por número de factura"
+        (input)="onSearchInput($event)"
+      />
+      <select (change)="onStatusChange($event)">
+        <option value="all">Todas</option>
+        <option value="pagada">Pagadas</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="anulada">Anuladas</option>
+      </select>
+      <span class="spacer"></span>
+      <span class="muted">{{ total() }} resultado(s)</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-empty">Cargando ventas...</div>
+    } @else if (items().length > 0) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Factura</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th class="right">Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sale of items(); track sale._id) {
+              <tr>
+                <td>
+                  <strong>{{ sale.invoiceNumber }}</strong>
+                </td>
+                <td>{{ clientName(sale) }}</td>
+                <td>{{ sale.createdAt | dateEs:'datetime' }}</td>
+                <td class="right">{{ sale.total | money }}</td>
+                <td>
+                  <span [class]="statusClass(sale.status)">
+                    {{ sale.status }}
+                  </span>
+                </td>
+                <td class="actions">
+                  <button
+                    type="button"
+                    class="btn btn--secondary btn--sm"
+                    (click)="openDetail(sale)"
+                  >
+                    Ver
+                  </button>
+                  @if (sale.status === 'pendiente' && canSell()) {
+                    <button
+                      type="button"
+                      class="btn btn--primary btn--sm"
+                      (click)="pay(sale)"
+                    >
+                      Cobrar
+                    </button>
+                  }
+                  @if (sale.status !== 'anulada' && isAdmin()) {
+                    <button
+                      type="button"
+                      class="btn btn--danger btn--sm"
+                      (click)="cancel(sale)"
+                    >
+                      Anular
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ page() }} de {{ pages() }}</span>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() >= pages()"
+          (click)="goToPage(page() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    } @else {
+      <div class="table-empty">No hay ventas registradas.</div>
+    }
+  </section>
+</section>
+
+@if (selected(); as sale) {
+  <app-modal [title]="'Venta ' + sale.invoiceNumber" (close)="closeDetail()">
+    <div class="grid-2">
+      <div>
+        <span class="field-label">Cliente</span>
+        <p>{{ clientName(sale) }}</p>
+      </div>
+      <div>
+        <span class="field-label">Fecha</span>
+        <p>{{ sale.createdAt | dateEs:'datetime' }}</p>
+      </div>
+      <div>
+        <span class="field-label">Estado</span>
+        <p>
+          <span [class]="statusClass(sale.status)">{{ sale.status }}</span>
+        </p>
+      </div>
+      <div>
+        <span class="field-label">Registrada por</span>
+        <p>{{ userName(sale) }}</p>
+      </div>
+    </div>
+
+    <div class="table-wrap mt-1">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th class="right">Cantidad</th>
+            <th class="right">Precio</th>
+            <th class="right">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of sale.items; track $index) {
+            <tr>
+              <td>
+                <strong>{{ item.name }}</strong>
+                <div class="muted">{{ item.sku }}</div>
+              </td>
+              <td class="right">{{ item.quantity }}</td>
+              <td class="right">{{ item.unitPrice | money }}</td>
+              <td class="right">{{ item.subtotal | money }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="totals">
+      <div>
+        <span>Subtotal</span>
+        <strong>{{ sale.subtotal | money }}</strong>
+      </div>
+      <div>
+        <span>Impuesto ({{ sale.taxRate }}%)</span>
+        <strong>{{ sale.tax | money }}</strong>
+      </div>
+      <div class="grand">
+        <span>Total</span>
+        <strong>{{ sale.total | money }}</strong>
+      </div>
+    </div>
+
+    @if (sale.notes) {
+      <p class="muted mt-1">{{ sale.notes }}</p>
+    }
+
+    <div class="form-actions mt-1">
+      @if (sale.status === 'pendiente' && canSell()) {
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="pay(sale)"
+        >
+          Marcar pagada
+        </button>
+      }
+      @if (sale.status !== 'anulada' && isAdmin()) {
+        <button type="button" class="btn btn--danger" (click)="cancel(sale)">
+          Anular venta
+        </button>
+      }
+    </div>
+  </app-modal>
+}

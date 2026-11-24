@@ -1,0 +1,178 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Usuarios</h1>
+      <p>{{ total() }} usuario(s) registrados.</p>
+    </div>
+    <button type="button" class="btn btn--primary" (click)="openCreate()">
+      Nuevo usuario
+    </button>
+  </header>
+
+  <section class="card">
+    <div class="toolbar">
+      <input
+        type="search"
+        placeholder="Buscar por nombre o correo"
+        (input)="onSearchInput($event)"
+      />
+      <span class="spacer"></span>
+      <span class="muted">{{ total() }} resultado(s)</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-empty">Cargando usuarios...</div>
+    } @else if (users().length > 0) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Creado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users(); track user._id) {
+              <tr>
+                <td>
+                  <strong>{{ user.name }}</strong>
+                  @if (isSelf(user)) {
+                    <span class="badge badge--info">tú</span>
+                  }
+                </td>
+                <td>{{ user.email }}</td>
+                <td>{{ roleLabel(user.role) }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [class.badge--success]="user.active"
+                    [class.badge--danger]="!user.active"
+                  >
+                    {{ user.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td>{{ user.createdAt | dateEs }}</td>
+                <td class="actions">
+                  <button
+                    type="button"
+                    class="btn btn--secondary btn--sm"
+                    (click)="openEdit(user)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn--danger btn--sm"
+                    [disabled]="isSelf(user)"
+                    (click)="remove(user)"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ page() }} de {{ pages() }}</span>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() >= pages()"
+          (click)="goToPage(page() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    } @else {
+      <div class="table-empty">No hay usuarios registrados.</div>
+    }
+  </section>
+</section>
+
+@if (modalOpen()) {
+  <app-modal [title]="modalTitle()" (close)="closeModal()">
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <div class="field span-2">
+        <label for="user-name">Nombre</label>
+        <input id="user-name" formControlName="name" />
+      </div>
+      <div class="field span-2">
+        <label for="user-email">Correo</label>
+        <input id="user-email" type="email" formControlName="email" />
+      </div>
+      <div class="field">
+        <label for="user-role">Rol</label>
+        <select
+          id="user-role"
+          formControlName="role"
+          [attr.disabled]="editingSelf() ? '' : null"
+        >
+          <option value="admin">Administrador</option>
+          <option value="vendedor">Vendedor</option>
+          <option value="inventario">Inventario</option>
+        </select>
+        @if (editingSelf()) {
+          <small class="muted">No puedes cambiar tu propio rol.</small>
+        }
+      </div>
+      <div class="field">
+        <label>Estado</label>
+        <label class="checkbox">
+          <input
+            type="checkbox"
+            formControlName="active"
+            [attr.disabled]="editingSelf() ? '' : null"
+          />
+          <span>Usuario activo</span>
+        </label>
+        @if (editingSelf()) {
+          <small class="muted">No puedes desactivar tu propio usuario.</small>
+        }
+      </div>
+      <div class="field span-2">
+        <label for="user-password">
+          {{ editing() ? 'Nueva contraseña (opcional)' : 'Contraseña' }}
+        </label>
+        <input
+          id="user-password"
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          [placeholder]="
+            editing() ? 'Dejar en blanco para conservar' : 'Mínimo 6 caracteres'
+          "
+        />
+      </div>
+      <div class="form-actions span-2">
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="saving() || form.invalid"
+        >
+          {{ saving() ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button
+          type="button"
+          class="btn btn--secondary"
+          (click)="closeModal()"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </app-modal>
+}

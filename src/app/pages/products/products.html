@@ -1,0 +1,219 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Productos</h1>
+      <p>{{ total() }} producto(s) en el catálogo.</p>
+    </div>
+    @if (canManage()) {
+      <button type="button" class="btn btn--primary" (click)="openCreate()">
+        Nuevo producto
+      </button>
+    }
+  </header>
+
+  <section class="card">
+    <div class="toolbar">
+      <input
+        type="search"
+        placeholder="Buscar por nombre, SKU o categoría"
+        (input)="onSearchInput($event)"
+      />
+      <select (change)="onActiveChange($event)">
+        <option value="all">Todos</option>
+        <option value="true">Activos</option>
+        <option value="false">Inactivos</option>
+      </select>
+      <label class="checkbox">
+        <input type="checkbox" (change)="onLowStockChange($event)" />
+        Solo stock bajo
+      </label>
+      <span class="spacer"></span>
+      <span class="muted">{{ total() }} resultado(s)</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-empty">Cargando productos...</div>
+    } @else if (items().length > 0) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th class="right">Precio</th>
+              <th class="right">Stock</th>
+              <th class="right">Mínimo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of items(); track product._id) {
+              <tr>
+                <td>{{ product.sku }}</td>
+                <td>
+                  <strong>{{ product.name }}</strong>
+                </td>
+                <td>{{ product.category || '—' }}</td>
+                <td class="right">{{ product.price | money }}</td>
+                <td class="right">
+                  <span
+                    [class]="
+                      isLow(product)
+                        ? 'badge badge--warning'
+                        : 'badge badge--success'
+                    "
+                  >
+                    {{ product.stock }}
+                  </span>
+                </td>
+                <td class="right">{{ product.minStock }}</td>
+                <td>
+                  <span
+                    [class]="
+                      product.active
+                        ? 'badge badge--success'
+                        : 'badge badge--neutral'
+                    "
+                  >
+                    {{ product.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="actions">
+                  @if (canManage()) {
+                    <button
+                      type="button"
+                      class="btn btn--secondary btn--sm"
+                      (click)="openEdit(product)"
+                    >
+                      Editar
+                    </button>
+                  }
+                  @if (isAdmin()) {
+                    <button
+                      type="button"
+                      class="btn btn--danger btn--sm"
+                      (click)="remove(product)"
+                    >
+                      Eliminar
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ page() }} de {{ pages() }}</span>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() >= pages()"
+          (click)="goToPage(page() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    } @else {
+      <div class="table-empty">No hay productos que coincidan.</div>
+    }
+  </section>
+</section>
+
+@if (showForm()) {
+  <app-modal
+    [title]="editing() ? 'Editar producto' : 'Nuevo producto'"
+    (close)="closeForm()"
+  >
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <div class="field">
+        <label for="product-sku">SKU</label>
+        <input id="product-sku" formControlName="sku" />
+      </div>
+      <div class="field">
+        <label for="product-name">Nombre</label>
+        <input id="product-name" formControlName="name" />
+      </div>
+      <div class="field">
+        <label for="product-category">Categoría</label>
+        <input id="product-category" formControlName="category" />
+      </div>
+      <div class="field">
+        <label for="product-price">Precio de venta</label>
+        <input
+          id="product-price"
+          type="number"
+          min="0"
+          step="0.01"
+          formControlName="price"
+        />
+      </div>
+      <div class="field">
+        <label for="product-cost">Costo</label>
+        <input
+          id="product-cost"
+          type="number"
+          min="0"
+          step="0.01"
+          formControlName="cost"
+        />
+      </div>
+      <div class="field">
+        <label for="product-stock">Stock</label>
+        <input
+          id="product-stock"
+          type="number"
+          min="0"
+          step="1"
+          formControlName="stock"
+        />
+        @if (editing()) {
+          <small class="muted">Cambiar el stock genera un ajuste.</small>
+        }
+      </div>
+      <div class="field">
+        <label for="product-min">Stock mínimo</label>
+        <input
+          id="product-min"
+          type="number"
+          min="0"
+          step="1"
+          formControlName="minStock"
+        />
+      </div>
+      <div class="field span-2">
+        <label for="product-description">Descripción</label>
+        <textarea
+          id="product-description"
+          formControlName="description"
+        ></textarea>
+      </div>
+      <label class="checkbox span-2">
+        <input type="checkbox" formControlName="active" />
+        Producto activo
+      </label>
+      <div class="form-actions span-2">
+        <button type="button" class="btn btn--secondary" (click)="closeForm()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="saving() || form.invalid"
+        >
+          {{ saving() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </app-modal>
+}

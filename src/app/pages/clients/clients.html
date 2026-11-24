@@ -1,0 +1,163 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Clientes</h1>
+      <p>{{ total() }} cliente(s) registrados.</p>
+    </div>
+    @if (canWrite()) {
+      <button type="button" class="btn btn--primary" (click)="openCreate()">
+        Nuevo cliente
+      </button>
+    }
+  </header>
+
+  <section class="card">
+    <div class="toolbar">
+      <input
+        type="search"
+        placeholder="Buscar por nombre, RNC, correo o teléfono"
+        (input)="onSearchInput($event)"
+      />
+      <select (change)="onActiveChange($event)">
+        <option value="all">Todos</option>
+        <option value="true">Activos</option>
+        <option value="false">Inactivos</option>
+      </select>
+      <span class="spacer"></span>
+      <span class="muted">{{ total() }} resultado(s)</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-empty">Cargando clientes...</div>
+    } @else if (items().length > 0) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>RNC / Cédula</th>
+              <th>Contacto</th>
+              <th>Alta</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (client of items(); track client._id) {
+              <tr>
+                <td>
+                  <strong>{{ client.name }}</strong>
+                </td>
+                <td>{{ client.taxId || '—' }}</td>
+                <td>{{ contact(client) }}</td>
+                <td>{{ client.createdAt | dateEs }}</td>
+                <td>
+                  <span
+                    [class]="
+                      client.active
+                        ? 'badge badge--success'
+                        : 'badge badge--neutral'
+                    "
+                  >
+                    {{ client.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="actions">
+                  @if (canWrite()) {
+                    <button
+                      type="button"
+                      class="btn btn--secondary btn--sm"
+                      (click)="openEdit(client)"
+                    >
+                      Editar
+                    </button>
+                  }
+                  @if (isAdmin()) {
+                    <button
+                      type="button"
+                      class="btn btn--danger btn--sm"
+                      (click)="remove(client)"
+                    >
+                      Eliminar
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ page() }} de {{ pages() }}</span>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() >= pages()"
+          (click)="goToPage(page() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    } @else {
+      <div class="table-empty">No hay clientes que coincidan.</div>
+    }
+  </section>
+</section>
+
+@if (showForm()) {
+  <app-modal
+    [title]="editing() ? 'Editar cliente' : 'Nuevo cliente'"
+    (close)="closeForm()"
+  >
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+      <div class="field span-2">
+        <label for="client-name">Nombre</label>
+        <input id="client-name" formControlName="name" />
+      </div>
+      <div class="field">
+        <label for="client-tax">RNC / Cédula</label>
+        <input id="client-tax" formControlName="taxId" />
+      </div>
+      <div class="field">
+        <label for="client-phone">Teléfono</label>
+        <input id="client-phone" formControlName="phone" />
+      </div>
+      <div class="field">
+        <label for="client-email">Correo</label>
+        <input id="client-email" type="email" formControlName="email" />
+      </div>
+      <div class="field">
+        <label for="client-address">Dirección</label>
+        <input id="client-address" formControlName="address" />
+      </div>
+      <div class="field span-2">
+        <label for="client-notes">Notas</label>
+        <textarea id="client-notes" formControlName="notes"></textarea>
+      </div>
+      <label class="checkbox span-2">
+        <input type="checkbox" formControlName="active" />
+        Cliente activo
+      </label>
+      <div class="form-actions span-2">
+        <button type="button" class="btn btn--secondary" (click)="closeForm()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="saving() || form.invalid"
+        >
+          {{ saving() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </app-modal>
+}
