@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
 import { Role } from './core/models';
@@ -13,7 +13,6 @@ import { ToastService } from './core/toast.service';
 export class App {
   private readonly toastService = inject(ToastService);
 
-  protected readonly title = signal('CHsistem');
   protected readonly auth = inject(AuthService);
   protected readonly toasts = this.toastService.toasts;
 
@@ -22,6 +21,18 @@ export class App {
     if (role === 'vendedor') return 'Vendedor';
     if (role === 'inventario') return 'Inventario';
     return '';
+  }
+
+  protected initials(): string {
+    const name = this.auth.user()?.name?.trim();
+
+    if (!name) return 'CH';
+
+    return name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('');
   }
 
   protected dismissToast(id: number): void {

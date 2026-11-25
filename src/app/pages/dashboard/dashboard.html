@@ -1,6 +1,7 @@
 <section class="page">
-  <header class="page-header">
-    <div>
+  <section class="hero">
+    <div class="hero__content">
+      <span class="eyebrow">Panel de control</span>
       <h1>Hola, {{ auth.user()?.name }}</h1>
       <p>Resumen de tu operación en CHsistem.</p>
     </div>
@@ -27,7 +28,7 @@
         </a>
       }
     </div>
-  </header>
+  </section>
 
   @if (loading()) {
     <div class="card card--pad muted">Cargando panel...</div>
@@ -77,12 +78,11 @@
         </div>
         @if (s.recentSales.length > 0) {
           <div class="table-wrap">
-            <table>
+            <table class="table--compact">
               <thead>
                 <tr>
                   <th>Factura</th>
                   <th>Cliente</th>
-                  <th>Fecha</th>
                   <th class="right">Total</th>
                   <th>Estado</th>
                 </tr>
@@ -90,9 +90,11 @@
               <tbody>
                 @for (sale of s.recentSales; track sale._id) {
                   <tr>
-                    <td>{{ sale.invoiceNumber }}</td>
+                    <td>
+                      <strong class="nowrap">{{ sale.invoiceNumber }}</strong>
+                      <div class="muted">{{ sale.createdAt | dateEs }}</div>
+                    </td>
                     <td>{{ clientName(sale) }}</td>
-                    <td>{{ sale.createdAt | dateEs }}</td>
                     <td class="right">{{ sale.total | money }}</td>
                     <td>
                       <span [class]="statusClass(sale.status)">
@@ -116,7 +118,7 @@
         </div>
         @if (s.lowStockProducts.length > 0) {
           <div class="table-wrap">
-            <table>
+            <table class="table--compact">
               <thead>
                 <tr>
                   <th>Producto</th>
@@ -129,7 +131,7 @@
                 @for (product of s.lowStockProducts; track product._id) {
                   <tr>
                     <td>{{ product.name }}</td>
-                    <td>{{ product.sku }}</td>
+                    <td class="nowrap">{{ product.sku }}</td>
                     <td class="right">
                       <span class="badge badge--warning">
                         {{ product.stock }}
