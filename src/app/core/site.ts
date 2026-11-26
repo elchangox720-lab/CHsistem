@@ -1,7 +1,7 @@
 export const SITE = {
   name: 'CHsistems',
   tagline: 'Tecnología sin límites',
-  whatsapp: '18090000000',
-  whatsappLabel: '+1 809 000 0000',
-  email: 'hola@chsistems.com',
+  whatsapp: '573222326038',
+  whatsappLabel: '+57 322 232 6038',
+  email: 'chsistem01@gmail.com',
 } as const;
