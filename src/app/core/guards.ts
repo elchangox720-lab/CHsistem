@@ -16,11 +16,18 @@ export const authGuard: CanActivateFn = (route, state) => {
   });
 };
 
+export const landingGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.isAuthenticated() ? router.createUrlTree(['/panel']) : true;
+};
+
 export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  return auth.isAuthenticated() ? router.createUrlTree(['/']) : true;
+  return auth.isAuthenticated() ? router.createUrlTree(['/panel']) : true;
 };
 
 export const roleGuard: CanActivateFn = (route) => {
@@ -35,5 +42,5 @@ export const roleGuard: CanActivateFn = (route) => {
     return true;
   }
 
-  return router.createUrlTree([auth.isAuthenticated() ? '/' : '/login']);
+  return router.createUrlTree([auth.isAuthenticated() ? '/panel' : '/login']);
 };

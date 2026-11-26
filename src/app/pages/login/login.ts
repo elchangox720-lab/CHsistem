@@ -4,7 +4,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
@@ -13,7 +13,7 @@ import { ToastService } from '../../core/toast.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -110,7 +110,7 @@ export class Login implements OnInit {
   private goHome(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     const target =
-      returnUrl && returnUrl.startsWith('/') ? returnUrl : '/';
+      returnUrl && returnUrl.startsWith('/') ? returnUrl : '/panel';
     void this.router.navigateByUrl(target);
   }
 }

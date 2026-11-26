@@ -1,7 +1,13 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, roleGuard } from './core/guards';
+import { authGuard, guestGuard, landingGuard, roleGuard } from './core/guards';
 
 export const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./pages/landing/landing').then((m) => m.Landing),
+    canActivate: [landingGuard],
+  },
   {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login),
@@ -12,7 +18,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
-        path: '',
+        path: 'panel',
         loadComponent: () =>
           import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
       },

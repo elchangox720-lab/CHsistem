@@ -41,6 +41,11 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 92px;
+}
+
 html,
 body {
   margin: 0;
@@ -985,6 +990,10 @@ td.actions {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {

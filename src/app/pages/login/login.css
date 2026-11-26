@@ -124,6 +124,20 @@
   );
 }
 
+.auth__back {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.auth__back:hover {
+  color: var(--gold-light);
+}
+
 .auth__card h2 {
   margin-bottom: 0.3rem;
   font-size: clamp(1.45rem, 2.4vw, 1.8rem);
