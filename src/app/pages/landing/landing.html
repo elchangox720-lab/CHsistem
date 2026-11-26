@@ -19,6 +19,7 @@
 
       <nav class="site-nav" aria-label="Navegación del sitio">
         <a href="#servicios">Servicios</a>
+        <a href="#productos">Productos</a>
         <a href="#planes">Planes</a>
         <a href="#proceso">Proceso</a>
         <a href="#contacto">Contacto</a>
@@ -46,6 +47,7 @@
           </summary>
           <nav class="mobile-menu__panel" aria-label="Menú móvil">
             <a href="#servicios" (click)="closeMenu($event)">Servicios</a>
+            <a href="#productos" (click)="closeMenu($event)">Productos</a>
             <a href="#planes" (click)="closeMenu($event)">Planes</a>
             <a href="#proceso" (click)="closeMenu($event)">Proceso</a>
             <a href="#contacto" (click)="closeMenu($event)">Contacto</a>
@@ -171,6 +173,8 @@
         }
       </div>
     </section>
+
+    <app-catalog />
 
     <section class="section section--plans" id="planes">
       <div class="section__head">
@@ -389,6 +393,7 @@
 
       <nav class="site-footer__nav" aria-label="Enlaces del pie">
         <a href="#servicios">Servicios</a>
+        <a href="#productos">Productos</a>
         <a href="#planes">Planes</a>
         <a href="#proceso">Proceso</a>
         <a href="#contacto">Contacto</a>

@@ -2,6 +2,11 @@ export type Role = 'admin' | 'vendedor' | 'inventario';
 export type MovementType = 'entrada' | 'salida' | 'ajuste';
 export type SaleStatus = 'pagada' | 'pendiente' | 'anulada';
 
+export interface ProductSpec {
+  label: string;
+  value: string;
+}
+
 export interface User {
   _id: string;
   name: string;
@@ -36,6 +41,9 @@ export interface Product {
   name: string;
   description?: string;
   category?: string;
+  brand?: string;
+  model?: string;
+  specs?: ProductSpec[];
   price: number;
   cost: number;
   stock: number;
@@ -43,6 +51,27 @@ export interface Product {
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface PublicProduct {
+  _id: string;
+  sku: string;
+  name: string;
+  description?: string;
+  category?: string;
+  brand?: string;
+  model?: string;
+  price: number;
+  specs: ProductSpec[];
+  available: boolean;
+}
+
+export interface CatalogResponse {
+  items: PublicProduct[];
+  total: number;
+  brands: string[];
+  models: string[];
+  categories: string[];
 }
 
 export interface StockMovement {
@@ -115,6 +144,9 @@ export interface ProductInput {
   name: string;
   description?: string;
   category?: string;
+  brand?: string;
+  model?: string;
+  specs?: ProductSpec[];
   price: number;
   cost?: number;
   stock?: number;

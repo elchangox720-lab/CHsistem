@@ -1,6 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import {
+  FormArray,
   FormBuilder,
+  FormControl,
+  FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -14,10 +17,16 @@ import { ToastService } from '../../core/toast.service';
 import { ModalComponent } from '../../shared/modal';
 import { MoneyPipe } from '../../shared/money.pipe';
 
+type SpecForm = FormGroup<{
+  label: FormControl<string>;
+  value: FormControl<string>;
+}>;
+
 @Component({
   selector: 'app-products',
   imports: [ReactiveFormsModule, ModalComponent, MoneyPipe],
   templateUrl: './products.html',
+  styleUrl: './products.css',
 })
 export class Products implements OnInit {
   private readonly service = inject(ProductsService);
@@ -44,16 +53,21 @@ export class Products implements OnInit {
 
   private searchTimer?: ReturnType<typeof setTimeout>;
 
+  protected readonly specs = this.fb.array<SpecForm>([]);
+
   protected readonly form = this.fb.nonNullable.group({
     sku: ['', Validators.required],
     name: ['', [Validators.required, Validators.minLength(2)]],
     category: [''],
+    brand: [''],
+    model: [''],
     description: [''],
     price: [0, [Validators.required, Validators.min(0)]],
     cost: [0, [Validators.min(0)]],
     stock: [0, [Validators.required, Validators.min(0)]],
     minStock: [0, [Validators.min(0)]],
     active: [true],
+    specs: this.specs,
   });
 
   ngOnInit(): void {
@@ -128,34 +142,14 @@ export class Products implements OnInit {
   protected openCreate(): void {
     if (!this.canManage()) return;
     this.editing.set(null);
-    this.form.reset({
-      sku: '',
-      name: '',
-      category: '',
-      description: '',
-      price: 0,
-      cost: 0,
-      stock: 0,
-      minStock: 0,
-      active: true,
-    });
+    this.resetForm();
     this.showForm.set(true);
   }
 
   protected openEdit(product: Product): void {
     if (!this.canManage()) return;
     this.editing.set(product);
-    this.form.reset({
-      sku: product.sku,
-      name: product.name,
-      category: product.category ?? '',
-      description: product.description ?? '',
-      price: product.price,
-      cost: product.cost ?? 0,
-      stock: product.stock,
-      minStock: product.minStock,
-      active: product.active,
-    });
+    this.resetForm(product);
     this.showForm.set(true);
   }
 
@@ -163,10 +157,51 @@ export class Products implements OnInit {
     this.showForm.set(false);
   }
 
+  protected addSpec(): void {
+    this.specs.push(this.newSpec());
+  }
+
+  protected removeSpec(index: number): void {
+    this.specs.removeAt(index);
+  }
+
+  private resetForm(product?: Product): void {
+    this.form.reset({
+      sku: product?.sku ?? '',
+      name: product?.name ?? '',
+      category: product?.category ?? '',
+      brand: product?.brand ?? '',
+      model: product?.model ?? '',
+      description: product?.description ?? '',
+      price: product?.price ?? 0,
+      cost: product?.cost ?? 0,
+      stock: product?.stock ?? 0,
+      minStock: product?.minStock ?? 0,
+      active: product?.active ?? true,
+    });
+
+    this.specs.clear();
+
+    for (const spec of product?.specs ?? []) {
+      this.specs.push(this.newSpec(spec.label, spec.value));
+    }
+  }
+
+  private newSpec(label = '', value = ''): SpecForm {
+    return this.fb.nonNullable.group({ label, value });
+  }
+
   protected save(): void {
     if (this.form.invalid || this.saving()) return;
 
     const payload = this.form.getRawValue();
+    payload.specs = this.specs.controls
+      .map((spec) => ({
+        label: spec.controls.label.value.trim(),
+        value: spec.controls.value.value.trim(),
+      }))
+      .filter((spec) => spec.label && spec.value);
+
     const editing = this.editing();
     this.saving.set(true);
 

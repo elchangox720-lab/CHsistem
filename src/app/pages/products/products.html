@@ -15,7 +15,7 @@
     <div class="toolbar">
       <input
         type="search"
-        placeholder="Buscar por nombre, SKU o categoría"
+        placeholder="Buscar producto, SKU, marca o modelo"
         (input)="onSearchInput($event)"
       />
       <select (change)="onActiveChange($event)">
@@ -40,6 +40,8 @@
             <tr>
               <th>SKU</th>
               <th>Producto</th>
+              <th>Marca</th>
+              <th>Modelo</th>
               <th>Categoría</th>
               <th class="right">Precio</th>
               <th class="right">Stock</th>
@@ -55,6 +57,8 @@
                 <td>
                   <strong>{{ product.name }}</strong>
                 </td>
+                <td>{{ product.brand || '—' }}</td>
+                <td>{{ product.model || '—' }}</td>
                 <td>{{ product.category || '—' }}</td>
                 <td class="right">{{ product.price | money }}</td>
                 <td class="right">
@@ -145,8 +149,28 @@
         <input id="product-name" formControlName="name" />
       </div>
       <div class="field">
+        <label for="product-brand">Marca</label>
+        <input
+          id="product-brand"
+          formControlName="brand"
+          placeholder="Ej. Apple, Samsung, Lenovo"
+        />
+      </div>
+      <div class="field">
+        <label for="product-model">Modelo</label>
+        <input
+          id="product-model"
+          formControlName="model"
+          placeholder="Ej. MacBook Air M3"
+        />
+      </div>
+      <div class="field">
         <label for="product-category">Categoría</label>
-        <input id="product-category" formControlName="category" />
+        <input
+          id="product-category"
+          formControlName="category"
+          placeholder="Ej. Laptops, Monitores, Accesorios"
+        />
       </div>
       <div class="field">
         <label for="product-price">Precio de venta</label>
@@ -197,6 +221,45 @@
           id="product-description"
           formControlName="description"
         ></textarea>
+      </div>
+      <div class="field span-2" formArrayName="specs">
+        <span class="field-label">Características del equipo</span>
+        @if (specs.length > 0) {
+          <div class="spec-list">
+            @for (spec of specs.controls; track $index; let i = $index) {
+              <div class="spec-row" [formGroupName]="i">
+                <input
+                  formControlName="label"
+                  placeholder="Característica (ej. Procesador)"
+                  aria-label="Característica"
+                />
+                <input
+                  formControlName="value"
+                  placeholder="Valor (ej. Intel Core i7)"
+                  aria-label="Valor"
+                />
+                <button
+                  type="button"
+                  class="btn btn--ghost btn--sm"
+                  (click)="removeSpec(i)"
+                >
+                  Quitar
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <small class="muted">
+            Agrega las especificaciones que verán los clientes en el catálogo.
+          </small>
+        }
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm spec-add"
+          (click)="addSpec()"
+        >
+          + Agregar característica
+        </button>
       </div>
       <label class="checkbox span-2">
         <input type="checkbox" formControlName="active" />

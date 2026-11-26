@@ -1,0 +1,210 @@
+<section class="catalog" id="productos">
+  <div class="catalog__head">
+    <div>
+      <span class="eyebrow">Productos tecnológicos</span>
+      <h2>
+        Equipos con
+        <span class="text-gold">características claras</span>
+      </h2>
+      <p>
+        Explora los equipos disponibles, filtra por marca, modelo o categoría y
+        revisa sus especificaciones antes de consultar.
+      </p>
+    </div>
+    <span class="catalog__count">{{ filtered().length }} equipo(s)</span>
+  </div>
+
+  <div class="catalog__filters">
+    <input
+      type="search"
+      placeholder="Buscar por producto, marca, modelo o SKU"
+      aria-label="Buscar productos"
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+
+    <select
+      aria-label="Filtrar por marca"
+      [value]="brand()"
+      (change)="onBrand($event)"
+    >
+      <option value="">Todas las marcas</option>
+      @for (brand of brands(); track brand) {
+        <option [value]="brand">{{ brand }}</option>
+      }
+    </select>
+
+    <select
+      aria-label="Filtrar por modelo"
+      [value]="model()"
+      (change)="onModel($event)"
+    >
+      <option value="">Todos los modelos</option>
+      @for (model of models(); track model) {
+        <option [value]="model">{{ model }}</option>
+      }
+    </select>
+
+    <select
+      aria-label="Filtrar por categoría"
+      [value]="category()"
+      (change)="onCategory($event)"
+    >
+      <option value="">Todas las categorías</option>
+      @for (category of categories(); track category) {
+        <option [value]="category">{{ category }}</option>
+      }
+    </select>
+
+    @if (hasFilters()) {
+      <button
+        type="button"
+        class="btn btn--ghost btn--sm"
+        (click)="clearFilters()"
+      >
+        Limpiar
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="catalog-state card card--pad">
+      Cargando productos tecnológicos...
+    </div>
+  } @else if (error()) {
+    <div class="catalog-state card card--pad">
+      <p>{{ error() }}</p>
+      <button type="button" class="btn btn--secondary btn--sm" (click)="load()">
+        Reintentar
+      </button>
+    </div>
+  } @else if (filtered().length > 0) {
+    <div class="catalog-grid">
+      @for (product of filtered(); track product._id) {
+        <article class="product-card">
+          <div class="product-card__top">
+            <span class="product-card__category">
+              {{ product.category || 'Tecnología' }}
+            </span>
+            <span
+              class="badge"
+              [class.badge--success]="product.available"
+              [class.badge--neutral]="!product.available"
+            >
+              {{ product.available ? 'Disponible' : 'Agotado' }}
+            </span>
+          </div>
+
+          <h3>{{ product.name }}</h3>
+          <p class="product-card__meta">
+            {{ product.brand || 'Marca por confirmar' }}
+            @if (product.model) {
+              <span>· {{ product.model }}</span>
+            }
+          </p>
+          <p class="product-card__description">
+            {{ product.description || 'Equipo tecnológico disponible en CHsistems.' }}
+          </p>
+
+          @if (previewSpecs(product).length > 0) {
+            <ul class="product-card__specs">
+              @for (spec of previewSpecs(product); track $index) {
+                <li>
+                  <span>{{ spec.label }}</span>
+                  <strong>{{ spec.value }}</strong>
+                </li>
+              }
+            </ul>
+          }
+
+          <div class="product-card__footer">
+            <span class="product-card__price">{{ product.price | money }}</span>
+            <button
+              type="button"
+              class="btn btn--secondary btn--sm"
+              (click)="open(product)"
+            >
+              Ver características
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="catalog-state card card--pad">
+      @if (hasFilters()) {
+        <p>No hay equipos que coincidan con los filtros seleccionados.</p>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          (click)="clearFilters()"
+        >
+          Limpiar filtros
+        </button>
+      } @else {
+        <p>Pronto publicaremos nuevos equipos tecnológicos.</p>
+      }
+    </div>
+  }
+</section>
+
+@if (selected(); as product) {
+  <app-modal [title]="product.name" (close)="close()">
+    <div class="product-detail">
+      <div class="product-detail__meta">
+        <span class="badge badge--neutral">
+          {{ product.category || 'Tecnología' }}
+        </span>
+        <span
+          class="badge"
+          [class.badge--success]="product.available"
+          [class.badge--neutral]="!product.available"
+        >
+          {{ product.available ? 'Disponible' : 'Agotado' }}
+        </span>
+      </div>
+
+      <p class="product-detail__brand">
+        {{ product.brand || 'Marca por confirmar' }}
+        @if (product.model) {
+          <span>· {{ product.model }}</span>
+        }
+        @if (product.sku) {
+          <span>· SKU {{ product.sku }}</span>
+        }
+      </p>
+
+      <p>
+        {{ product.description || 'Equipo tecnológico disponible en CHsistems.' }}
+      </p>
+
+      @if (product.specs?.length) {
+        <dl class="product-detail__specs">
+          @for (spec of product.specs ?? []; track $index) {
+            <div>
+              <dt>{{ spec.label }}</dt>
+              <dd>{{ spec.value }}</dd>
+            </div>
+          }
+        </dl>
+      } @else {
+        <p class="muted">
+          Las características detalladas de este equipo se confirman al
+          consultar.
+        </p>
+      }
+
+      <div class="product-detail__footer">
+        <span class="product-detail__price">{{ product.price | money }}</span>
+        <a
+          class="btn btn--primary"
+          [href]="waLink(product)"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Consultar por WhatsApp
+        </a>
+      </div>
+    </div>
+  </app-modal>
+}
