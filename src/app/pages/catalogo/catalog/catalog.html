@@ -82,6 +82,20 @@
     <div class="catalog-grid">
       @for (product of filtered(); track product._id) {
         <article class="product-card">
+          @if (product.image) {
+            <div class="product-card__media">
+              <img
+                [src]="product.image"
+                [alt]="product.name"
+                loading="lazy"
+              />
+            </div>
+          } @else {
+            <div class="product-card__media product-card__media--empty">
+              <span aria-hidden="true">{{ initial(product) }}</span>
+            </div>
+          }
+
           <div class="product-card__top">
             <span class="product-card__category">
               {{ product.category || 'Tecnología' }}
@@ -151,6 +165,12 @@
 @if (selected(); as product) {
   <app-modal [title]="product.name" (close)="close()">
     <div class="product-detail">
+      @if (product.image) {
+        <div class="product-detail__image">
+          <img [src]="product.image" [alt]="product.name" />
+        </div>
+      }
+
       <div class="product-detail__meta">
         <span class="badge badge--neutral">
           {{ product.category || 'Tecnología' }}

@@ -43,6 +43,7 @@ export interface Product {
   category?: string;
   brand?: string;
   model?: string;
+  image?: string;
   specs?: ProductSpec[];
   price: number;
   cost: number;
@@ -61,6 +62,7 @@ export interface PublicProduct {
   category?: string;
   brand?: string;
   model?: string;
+  image?: string;
   price: number;
   specs: ProductSpec[];
   available: boolean;
@@ -146,6 +148,7 @@ export interface ProductInput {
   category?: string;
   brand?: string;
   model?: string;
+  image?: string;
   specs?: ProductSpec[];
   price: number;
   cost?: number;

@@ -43,7 +43,8 @@
     <p>
       Solo los productos publicados aparecen en
       <a href="/catalogo" target="_blank" rel="noopener noreferrer">/catalogo</a>.
-      Completa marca, modelo y características para que la ficha se vea mejor.
+      Completa marca, modelo, características e imagen para que la ficha se vea
+      mejor.
     </p>
   </div>
 
@@ -85,12 +86,26 @@
               <tr>
                 <td>
                   <div class="web-product">
-                    <strong>{{ product.name }}</strong>
-                    <span class="muted">{{ product.sku }}</span>
+                    @if (product.image) {
+                      <img
+                        class="web-thumb"
+                        [src]="product.image"
+                        [alt]="product.name"
+                        loading="lazy"
+                      />
+                    } @else {
+                      <span class="web-thumb web-thumb--empty" aria-hidden="true">
+                        {{ initial(product) }}
+                      </span>
+                    }
+                    <div class="web-product__stack">
+                      <strong>{{ product.name }}</strong>
+                      <span class="muted">{{ product.sku }}</span>
+                    </div>
                   </div>
                 </td>
                 <td>
-                  <div class="web-product">
+                  <div class="web-product__stack">
                     <span>{{ product.brand || 'Sin marca' }}</span>
                     <span class="muted">{{ product.model || 'Sin modelo' }}</span>
                   </div>

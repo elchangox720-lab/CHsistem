@@ -144,6 +144,10 @@ export class Catalog implements OnInit {
     return (product.specs ?? []).slice(0, 3);
   }
 
+  protected initial(product: PublicProduct): string {
+    return (product.brand || product.name || 'CH').trim().charAt(0).toUpperCase();
+  }
+
   protected waLink(product: PublicProduct): string {
     const details = [
       product.brand,

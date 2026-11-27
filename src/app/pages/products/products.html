@@ -222,6 +222,42 @@
           formControlName="description"
         ></textarea>
       </div>
+      <div class="field span-2">
+        <label for="product-image">Imagen del producto</label>
+        <div class="image-field">
+          @if (form.controls.image.value) {
+            <div class="image-preview">
+              <img [src]="form.controls.image.value" alt="Vista previa" />
+              <button
+                type="button"
+                class="btn btn--ghost btn--sm"
+                (click)="removeImage()"
+              >
+                Quitar imagen
+              </button>
+            </div>
+          }
+          <div class="image-inputs">
+            <input
+              id="product-image"
+              type="text"
+              formControlName="image"
+              placeholder="https://... o sube una imagen"
+            />
+            <label class="btn btn--secondary btn--sm image-upload">
+              Subir imagen
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                (change)="onImageSelected($event)"
+              />
+            </label>
+          </div>
+          <small class="muted">
+            JPG, PNG o WebP. La imagen se optimiza antes de guardarse.
+          </small>
+        </div>
+      </div>
       <div class="field span-2" formArrayName="specs">
         <span class="field-label">Características del equipo</span>
         @if (specs.length > 0) {

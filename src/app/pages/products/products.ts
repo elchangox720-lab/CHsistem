@@ -61,6 +61,7 @@ export class Products implements OnInit {
     category: [''],
     brand: [''],
     model: [''],
+    image: [''],
     description: [''],
     price: [0, [Validators.required, Validators.min(0)]],
     cost: [0, [Validators.min(0)]],
@@ -177,6 +178,88 @@ export class Products implements OnInit {
     this.specs.removeAt(index);
   }
 
+  protected onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      this.toast.show('Usa una imagen JPG, PNG o WebP', 'error');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      this.toast.show('La imagen no puede superar 10 MB', 'error');
+      return;
+    }
+
+    this.compressImage(file)
+      .then((dataUrl) => {
+        this.form.controls.image.setValue(dataUrl);
+        this.form.controls.image.markAsDirty();
+      })
+      .catch(() =>
+        this.toast.show('No se pudo procesar la imagen', 'error')
+      );
+  }
+
+  protected removeImage(): void {
+    this.form.controls.image.setValue('');
+    this.form.controls.image.markAsDirty();
+  }
+
+  private compressImage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const objectUrl = URL.createObjectURL(file);
+      const image = new Image();
+
+      image.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+
+        const maxSide = 1200;
+        const scale = Math.min(
+          1,
+          maxSide / Math.max(image.width, image.height)
+        );
+        const width = Math.max(1, Math.round(image.width * scale));
+        const height = Math.max(1, Math.round(image.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext('2d');
+
+        if (!context) {
+          reject(new Error('Canvas no disponible'));
+          return;
+        }
+
+        context.fillStyle = '#0d0d11';
+        context.fillRect(0, 0, width, height);
+        context.drawImage(image, 0, 0, width, height);
+
+        let quality = 0.82;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+        while (dataUrl.length > 650000 && quality > 0.35) {
+          quality -= 0.08;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+
+        resolve(dataUrl);
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('No se pudo leer la imagen'));
+      };
+
+      image.src = objectUrl;
+    });
+  }
+
   private resetForm(product?: Product): void {
     this.form.reset({
       sku: product?.sku ?? '',
@@ -184,6 +267,7 @@ export class Products implements OnInit {
       category: product?.category ?? '',
       brand: product?.brand ?? '',
       model: product?.model ?? '',
+      image: product?.image ?? '',
       description: product?.description ?? '',
       price: product?.price ?? 0,
       cost: product?.cost ?? 0,

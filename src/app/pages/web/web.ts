@@ -135,4 +135,8 @@ export class Web implements OnInit {
       !(product.specs?.length ?? 0)
     );
   }
+
+  protected initial(product: Product): string {
+    return (product.brand || product.name || 'CH').trim().charAt(0).toUpperCase();
+  }
 }
