@@ -7,7 +7,6 @@ import {
 import { RouterLink } from '@angular/router';
 import { SITE } from '../../core/site';
 import { ToastService } from '../../core/toast.service';
-import { Catalog } from './catalog/catalog';
 
 interface Plan {
   name: string;
@@ -19,7 +18,7 @@ interface Plan {
 
 @Component({
   selector: 'app-landing',
-  imports: [ReactiveFormsModule, RouterLink, Catalog],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
 })

@@ -73,7 +73,19 @@ export class Products implements OnInit {
   ngOnInit(): void {
     this.load();
 
-    if (this.canManage() && this.route.snapshot.queryParamMap.get('nuevo')) {
+    if (!this.canManage()) return;
+
+    const editId = this.route.snapshot.queryParamMap.get('edit');
+
+    if (editId) {
+      this.service.get(editId).subscribe({
+        next: ({ product }) => this.openEdit(product),
+        error: (error) => this.toast.show(apiErrorMessage(error), 'error'),
+      });
+      return;
+    }
+
+    if (this.route.snapshot.queryParamMap.get('nuevo')) {
       this.openCreate();
     }
   }

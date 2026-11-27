@@ -1,0 +1,179 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Web</h1>
+      <p>Controla qué productos aparecen en el catálogo público.</p>
+    </div>
+    <div class="web-actions">
+      <a
+        class="btn btn--secondary"
+        href="/catalogo"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Ver catálogo
+      </a>
+      <a
+        class="btn btn--primary"
+        routerLink="/productos"
+        [queryParams]="{ nuevo: 1 }"
+      >
+        Nuevo producto
+      </a>
+    </div>
+  </header>
+
+  <div class="web-stats">
+    <article class="web-stat">
+      <span>Total productos</span>
+      <strong>{{ stats().total }}</strong>
+    </article>
+    <article class="web-stat web-stat--published">
+      <span>Publicados</span>
+      <strong>{{ stats().published }}</strong>
+    </article>
+    <article class="web-stat web-stat--hidden">
+      <span>Ocultos</span>
+      <strong>{{ stats().hidden }}</strong>
+    </article>
+  </div>
+
+  <div class="web-note card card--pad">
+    <strong>Catálogo público</strong>
+    <p>
+      Solo los productos publicados aparecen en
+      <a href="/catalogo" target="_blank" rel="noopener noreferrer">/catalogo</a>.
+      Completa marca, modelo y características para que la ficha se vea mejor.
+    </p>
+  </div>
+
+  <section class="card">
+    <div class="toolbar">
+      <input
+        type="search"
+        placeholder="Buscar producto, SKU, marca o modelo"
+        (input)="onSearchInput($event)"
+      />
+      <select (change)="onStatusChange($event)">
+        <option value="all">Todos</option>
+        <option value="published">Publicados</option>
+        <option value="hidden">Ocultos</option>
+      </select>
+      <span class="spacer"></span>
+      <span class="muted">{{ total() }} resultado(s)</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-empty">Cargando productos...</div>
+    } @else if (items().length > 0) {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Marca / modelo</th>
+              <th>Categoría</th>
+              <th class="right">Precio</th>
+              <th class="right">Stock</th>
+              <th>Ficha</th>
+              <th>Estado web</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of items(); track product._id) {
+              <tr>
+                <td>
+                  <div class="web-product">
+                    <strong>{{ product.name }}</strong>
+                    <span class="muted">{{ product.sku }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="web-product">
+                    <span>{{ product.brand || 'Sin marca' }}</span>
+                    <span class="muted">{{ product.model || 'Sin modelo' }}</span>
+                  </div>
+                </td>
+                <td>{{ product.category || '—' }}</td>
+                <td class="right">{{ product.price | money }}</td>
+                <td class="right">{{ product.stock }}</td>
+                <td>
+                  <span
+                    [class]="
+                      isIncomplete(product)
+                        ? 'badge badge--warning'
+                        : 'badge badge--success'
+                    "
+                  >
+                    {{ isIncomplete(product) ? 'Incompleta' : 'Completa' }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    [class]="
+                      product.active
+                        ? 'badge badge--success'
+                        : 'badge badge--neutral'
+                    "
+                  >
+                    {{ product.active ? 'Publicado' : 'Oculto' }}
+                  </span>
+                </td>
+                <td class="actions">
+                  <button
+                    type="button"
+                    class="btn btn--sm"
+                    [class.btn--secondary]="product.active"
+                    [class.btn--primary]="!product.active"
+                    [disabled]="savingId() === product._id"
+                    (click)="toggle(product)"
+                  >
+                    @if (savingId() === product._id) {
+                      Guardando...
+                    } @else {
+                      {{ product.active ? 'Ocultar' : 'Publicar' }}
+                    }
+                  </button>
+                  <a
+                    class="btn btn--secondary btn--sm"
+                    routerLink="/productos"
+                    [queryParams]="{ edit: product._id }"
+                  >
+                    Editar
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() <= 1"
+          (click)="goToPage(page() - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ page() }} de {{ pages() }}</span>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="page() >= pages()"
+          (click)="goToPage(page() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    } @else {
+      <div class="table-empty">
+        No hay productos que coincidan.
+        <a routerLink="/productos" [queryParams]="{ nuevo: 1 }">
+          Crear el primero
+        </a>
+      </div>
+    }
+  </section>
+</section>

@@ -51,6 +51,10 @@ export class ProductsService {
     });
   }
 
+  get(id: string) {
+    return this.api.get<{ product: Product }>(`/products/${id}`);
+  }
+
   create(input: ProductInput) {
     return this.api.post<{ product: Product }>('/products', input);
   }

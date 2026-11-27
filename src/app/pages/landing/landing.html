@@ -19,7 +19,7 @@
 
       <nav class="site-nav" aria-label="Navegación del sitio">
         <a href="#servicios">Servicios</a>
-        <a href="#productos">Productos</a>
+        <a routerLink="/catalogo">Catálogo</a>
         <a href="#planes">Planes</a>
         <a href="#proceso">Proceso</a>
         <a href="#contacto">Contacto</a>
@@ -47,7 +47,7 @@
           </summary>
           <nav class="mobile-menu__panel" aria-label="Menú móvil">
             <a href="#servicios" (click)="closeMenu($event)">Servicios</a>
-            <a href="#productos" (click)="closeMenu($event)">Productos</a>
+            <a routerLink="/catalogo" (click)="closeMenu($event)">Catálogo</a>
             <a href="#planes" (click)="closeMenu($event)">Planes</a>
             <a href="#proceso" (click)="closeMenu($event)">Proceso</a>
             <a href="#contacto" (click)="closeMenu($event)">Contacto</a>
@@ -174,7 +174,33 @@
       </div>
     </section>
 
-    <app-catalog />
+    <section class="section" id="productos">
+      <div class="catalog-teaser card card--pad">
+        <div>
+          <span class="eyebrow">Catálogo tecnológico</span>
+          <h2>
+            Equipos con
+            <span class="text-gold">características claras</span>
+          </h2>
+          <p>
+            Explora laptops, monitores y accesorios en una página dedicada,
+            filtra por marca o modelo y revisa sus especificaciones antes de
+            consultar.
+          </p>
+        </div>
+        <div class="catalog-teaser__actions">
+          <a class="btn btn--primary" routerLink="/catalogo">Ver catálogo</a>
+          <a
+            class="btn btn--secondary"
+            [href]="whatsappHref"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Consultar disponibilidad
+          </a>
+        </div>
+      </div>
+    </section>
 
     <section class="section section--plans" id="planes">
       <div class="section__head">
@@ -393,7 +419,7 @@
 
       <nav class="site-footer__nav" aria-label="Enlaces del pie">
         <a href="#servicios">Servicios</a>
-        <a href="#productos">Productos</a>
+        <a routerLink="/catalogo">Catálogo</a>
         <a href="#planes">Planes</a>
         <a href="#proceso">Proceso</a>
         <a href="#contacto">Contacto</a>

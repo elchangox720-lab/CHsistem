@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.web-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.web-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.web-stat {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background:
+    linear-gradient(160deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.01)),
+    var(--surface);
+}
+
+.web-stat span {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.web-stat strong {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.web-stat--published strong {
+  color: var(--success);
+}
+
+.web-stat--hidden strong {
+  color: var(--muted-strong);
+}
+
+.web-note {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.web-note strong {
+  color: var(--gold-light);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.web-note p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.web-note a {
+  color: var(--gold-light);
+}
+
+.web-product {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.web-product strong {
+  color: var(--text);
+}
+
+.web-product span {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .web-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .web-actions {
+    width: 100%;
+  }
+
+  .web-actions .btn {
+    flex: 1 1 100%;
+  }
+}

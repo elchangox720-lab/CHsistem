@@ -1,5 +1,12 @@
-import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from './core/auth.service';
 import { Role } from './core/models';
 import { ToastService } from './core/toast.service';
@@ -12,9 +19,32 @@ import { ToastService } from './core/toast.service';
 })
 export class App {
   private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
 
   protected readonly auth = inject(AuthService);
   protected readonly toasts = this.toastService.toasts;
+  protected readonly isPublicPage = signal(
+    this.isPublicUrl(window.location.pathname)
+  );
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+      )
+      .subscribe(() => {
+        this.isPublicPage.set(this.isPublicUrl(this.router.url));
+      });
+  }
+
+  private isPublicUrl(url: string): boolean {
+    const path = url.split(/[?#]/)[0];
+    return (
+      path === '/login' ||
+      path === '/catalogo' ||
+      path.startsWith('/catalogo/')
+    );
+  }
 
   protected roleLabel(role?: Role): string {
     if (role === 'admin') return 'Administrador';

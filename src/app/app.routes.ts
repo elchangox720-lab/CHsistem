@@ -9,6 +9,11 @@ export const routes: Routes = [
     canActivate: [landingGuard],
   },
   {
+    path: 'catalogo',
+    loadComponent: () =>
+      import('./pages/catalogo/catalogo').then((m) => m.Catalogo),
+  },
+  {
     path: 'login',
     loadComponent: () => import('./pages/login/login').then((m) => m.Login),
     canActivate: [guestGuard],
@@ -46,6 +51,13 @@ export const routes: Routes = [
         path: 'ventas/nueva',
         loadComponent: () =>
           import('./pages/sale-new/sale-new').then((m) => m.SaleNew),
+      },
+      {
+        path: 'web',
+        loadComponent: () =>
+          import('./pages/web/web').then((m) => m.Web),
+        canActivate: [roleGuard],
+        data: { roles: ['admin'] },
       },
       {
         path: 'usuarios',
