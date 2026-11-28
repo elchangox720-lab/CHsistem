@@ -1,15 +1,12 @@
 <section class="catalog" id="productos">
   <div class="catalog__head">
     <div>
-      <span class="eyebrow">Productos tecnológicos</span>
+      <span class="eyebrow">{{ content().catalog.eyebrow }}</span>
       <h2>
-        Equipos con
-        <span class="text-gold">características claras</span>
+        {{ content().catalog.title }}
+        <span class="text-gold">{{ content().catalog.accent }}</span>
       </h2>
-      <p>
-        Explora los equipos disponibles, filtra por marca, modelo o categoría y
-        revisa sus especificaciones antes de consultar.
-      </p>
+      <p>{{ content().catalog.description }}</p>
     </div>
     <span class="catalog__count">{{ filtered().length }} equipo(s)</span>
   </div>

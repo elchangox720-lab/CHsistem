@@ -1,0 +1,500 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Contenido de la landing</h1>
+      <p>
+        Edita los textos, servicios, planes y datos de contacto de la página
+        principal.
+      </p>
+    </div>
+    <div class="web-actions">
+      <a
+        class="btn btn--secondary"
+        routerLink="/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Ver landing
+      </a>
+      <button type="button" class="btn btn--ghost" (click)="resetDefaults()">
+        Restaurar textos
+      </button>
+      <button
+        type="button"
+        class="btn btn--primary"
+        [disabled]="saving() || loading()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="card card--pad">Cargando contenido de la landing...</div>
+  } @else {
+    <form class="content-form" [formGroup]="form" (ngSubmit)="save()">
+      <section class="card content-card">
+        <header class="content-card__head">
+          <div>
+            <h2>Portada</h2>
+            <p>Primera impresión de la página principal.</p>
+          </div>
+        </header>
+
+        <div class="form-grid" formGroupName="hero">
+          <div class="field span-2">
+            <label for="hero-eyebrow">Etiqueta superior</label>
+            <input id="hero-eyebrow" formControlName="eyebrow" />
+          </div>
+          <div class="field span-2">
+            <label for="hero-title">Título principal</label>
+            <input id="hero-title" formControlName="title" />
+          </div>
+          <div class="field span-2">
+            <label for="hero-accent">Texto destacado en dorado</label>
+            <input id="hero-accent" formControlName="accent" />
+          </div>
+          <div class="field span-2">
+            <label for="hero-description">Descripción</label>
+            <textarea
+              id="hero-description"
+              formControlName="description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="field">
+            <label for="hero-primary">Botón principal</label>
+            <input id="hero-primary" formControlName="primaryCta" />
+          </div>
+          <div class="field">
+            <label for="hero-secondary">Botón secundario</label>
+            <input id="hero-secondary" formControlName="secondaryCta" />
+          </div>
+        </div>
+
+        <div formGroupName="hero">
+          <div class="editor-block" formArrayName="points">
+            <div class="editor-block__head">
+              <strong>Puntos destacados</strong>
+              <button
+                type="button"
+                class="btn btn--secondary btn--sm"
+                (click)="addPoint()"
+              >
+                + Agregar punto
+              </button>
+            </div>
+            @for (point of points.controls; track $index; let i = $index) {
+              <div class="inline-row">
+                <input
+                  [formControlName]="i"
+                  placeholder="Ej. Diseño a medida"
+                  aria-label="Punto destacado"
+                />
+                <button
+                  type="button"
+                  class="btn btn--ghost btn--sm"
+                  (click)="removePoint(i)"
+                >
+                  Quitar
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="card content-card">
+        <header class="content-card__head">
+          <div>
+            <h2>Servicios</h2>
+            <p>Encabezado y tarjetas de la sección de servicios.</p>
+          </div>
+        </header>
+
+        <div class="form-grid" formGroupName="services">
+          <div class="field">
+            <label for="services-eyebrow">Etiqueta</label>
+            <input id="services-eyebrow" formControlName="eyebrow" />
+          </div>
+          <div class="field">
+            <label for="services-title">Título</label>
+            <input id="services-title" formControlName="title" />
+          </div>
+          <div class="field">
+            <label for="services-accent">Texto destacado</label>
+            <input id="services-accent" formControlName="accent" />
+          </div>
+          <div class="field span-2">
+            <label for="services-description">Descripción</label>
+            <textarea
+              id="services-description"
+              formControlName="description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="editor-block" formArrayName="benefits">
+          <div class="editor-block__head">
+            <strong>Tarjetas de servicios</strong>
+            <button
+              type="button"
+              class="btn btn--secondary btn--sm"
+              (click)="addBenefit()"
+            >
+              + Agregar tarjeta
+            </button>
+          </div>
+          @for (benefit of benefits.controls; track $index; let i = $index) {
+            <div class="editor-item" [formGroupName]="i">
+              <div class="editor-item__head">
+                <strong>Tarjeta {{ i + 1 }}</strong>
+                <button
+                  type="button"
+                  class="btn btn--ghost btn--sm"
+                  (click)="removeBenefit(i)"
+                >
+                  Quitar
+                </button>
+              </div>
+              <div class="form-grid">
+                <div class="field">
+                  <label>Título</label>
+                  <input formControlName="title" />
+                </div>
+                <div class="field span-2">
+                  <label>Texto</label>
+                  <textarea formControlName="text" rows="2"></textarea>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="card content-card">
+        <header class="content-card__head">
+          <div>
+            <h2>Catálogo</h2>
+            <p>Texto del bloque que invita a visitar el catálogo.</p>
+          </div>
+        </header>
+
+        <div class="form-grid" formGroupName="catalog">
+          <div class="field">
+            <label for="catalog-eyebrow">Etiqueta</label>
+            <input id="catalog-eyebrow" formControlName="eyebrow" />
+          </div>
+          <div class="field">
+            <label for="catalog-title">Título</label>
+            <input id="catalog-title" formControlName="title" />
+          </div>
+          <div class="field">
+            <label for="catalog-accent">Texto destacado</label>
+            <input id="catalog-accent" formControlName="accent" />
+          </div>
+          <div class="field">
+            <label for="catalog-cta">Texto del botón</label>
+            <input id="catalog-cta" formControlName="cta" />
+          </div>
+          <div class="field span-2">
+            <label for="catalog-description">Descripción</label>
+            <textarea
+              id="catalog-description"
+              formControlName="description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="card content-card">
+        <header class="content-card__head">
+          <div>
+            <h2>Planes</h2>
+            <p>Encabezado, nota y tarjetas de precios.</p>
+          </div>
+        </header>
+
+        <div class="form-grid" formGroupName="plans">
+          <div class="field">
+            <label for="plans-eyebrow">Etiqueta</label>
+            <input id="plans-eyebrow" formControlName="eyebrow" />
+          </div>
+          <div class="field">
+            <label for="plans-title">Título</label>
+            <input id="plans-title" formControlName="title" />
+          </div>
+          <div class="field">
+            <label for="plans-accent">Texto destacado</label>
+            <input id="plans-accent" formControlName="accent" />
+          </div>
+          <div class="field span-2">
+            <label for="plans-description">Descripción</label>
+            <textarea
+              id="plans-description"
+              formControlName="description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="plans-note">Nota inferior de los planes</label>
+          <input id="plans-note" formControlName="plansNote" />
+        </div>
+
+        <div class="editor-block" formArrayName="planItems">
+          <div class="editor-block__head">
+            <strong>Planes y precios</strong>
+            <button
+              type="button"
+              class="btn btn--secondary btn--sm"
+              (click)="addPlan()"
+            >
+              + Agregar plan
+            </button>
+          </div>
+          @for (plan of planItems.controls; track $index; let i = $index) {
+            <div class="editor-item" [formGroupName]="i">
+              <div class="editor-item__head">
+                <strong>Plan {{ i + 1 }}</strong>
+                <button
+                  type="button"
+                  class="btn btn--ghost btn--sm"
+                  (click)="removePlan(i)"
+                >
+                  Quitar
+                </button>
+              </div>
+              <div class="form-grid">
+                <div class="field">
+                  <label>Nombre</label>
+                  <input formControlName="name" />
+                </div>
+                <div class="field">
+                  <label>Precio</label>
+                  <input formControlName="price" />
+                </div>
+                <div class="field span-2">
+                  <label>Descripción corta</label>
+                  <input formControlName="tagline" />
+                </div>
+                <label class="checkbox span-2">
+                  <input type="checkbox" formControlName="featured" />
+                  Plan destacado
+                </label>
+              </div>
+
+              <div class="editor-block" formArrayName="features">
+                <div class="editor-block__head">
+                  <strong>Características incluidas</strong>
+                  <button
+                    type="button"
+                    class="btn btn--ghost btn--sm"
+                    (click)="addFeature(i)"
+                  >
+                    + Agregar
+                  </button>
+                </div>
+                @for (
+                  feature of planFeatures(i).controls;
+                  track $index;
+                  let fi = $index
+                ) {
+                  <div class="inline-row">
+                    <input
+                      [formControlName]="fi"
+                      placeholder="Ej. Diseño adaptable"
+                      aria-label="Característica del plan"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn--ghost btn--sm"
+                      (click)="removeFeature(i, fi)"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="card content-card">
+        <header class="content-card__head">
+          <div>
+            <h2>Proceso</h2>
+            <p>Pasos que se muestran debajo de los planes.</p>
+          </div>
+        </header>
+
+        <div class="form-grid" formGroupName="process">
+          <div class="field">
+            <label for="process-eyebrow">Etiqueta</label>
+            <input id="process-eyebrow" formControlName="eyebrow" />
+          </div>
+          <div class="field">
+            <label for="process-title">Título</label>
+            <input id="process-title" formControlName="title" />
+          </div>
+          <div class="field">
+            <label for="process-accent">Texto destacado</label>
+            <input id="process-accent" formControlName="accent" />
+          </div>
+          <div class="field span-2">
+            <label for="process-description">Descripción</label>
+            <textarea
+              id="process-description"
+              formControlName="description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="editor-block" formArrayName="steps">
+          <div class="editor-block__head">
+            <strong>Pasos del proceso</strong>
+            <button
+              type="button"
+              class="btn btn--secondary btn--sm"
+              (click)="addStep()"
+            >
+              + Agregar paso
+            </button>
+          </div>
+          @for (step of steps.controls; track $index; let i = $index) {
+            <div class="editor-item" [formGroupName]="i">
+              <div class="editor-item__head">
+                <strong>Paso {{ i + 1 }}</strong>
+                <button
+                  type="button"
+                  class="btn btn--ghost btn--sm"
+                  (click)="removeStep(i)"
+                >
+                  Quitar
+                </button>
+              </div>
+              <div class="form-grid">
+                <div class="field">
+                  <label>Título</label>
+                  <input formControlName="title" />
+                </div>
+                <div class="field span-2">
+                  <label>Texto</label>
+                  <textarea formControlName="text" rows="2"></textarea>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="card content-card">
+        <header class="content-card__head">
+          <div>
+            <h2>Contacto</h2>
+            <p>Datos que se usan en la landing y el catálogo.</p>
+          </div>
+        </header>
+
+        <div class="form-grid" formGroupName="contact">
+          <div class="field">
+            <label for="contact-eyebrow">Etiqueta</label>
+            <input id="contact-eyebrow" formControlName="eyebrow" />
+          </div>
+          <div class="field">
+            <label for="contact-title">Título</label>
+            <input id="contact-title" formControlName="title" />
+          </div>
+          <div class="field">
+            <label for="contact-accent">Texto destacado</label>
+            <input id="contact-accent" formControlName="accent" />
+          </div>
+          <div class="field span-2">
+            <label for="contact-description">Descripción</label>
+            <textarea
+              id="contact-description"
+              formControlName="description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="field">
+            <label for="contact-whatsapp">WhatsApp (solo dígitos)</label>
+            <input
+              id="contact-whatsapp"
+              formControlName="whatsapp"
+              inputmode="numeric"
+              placeholder="573222326038"
+            />
+            @if (
+              form.controls.contact.controls.whatsapp.touched &&
+              form.controls.contact.controls.whatsapp.invalid
+            ) {
+              <span class="field-error">
+                Escribe entre 7 y 15 dígitos, sin espacios.
+              </span>
+            }
+          </div>
+          <div class="field">
+            <label for="contact-whatsapp-label">WhatsApp visible</label>
+            <input
+              id="contact-whatsapp-label"
+              formControlName="whatsappLabel"
+              placeholder="+57 322 232 6038"
+            />
+          </div>
+          <div class="field span-2">
+            <label for="contact-email">Correo</label>
+            <input
+              id="contact-email"
+              type="email"
+              formControlName="email"
+            />
+            @if (
+              form.controls.contact.controls.email.touched &&
+              form.controls.contact.controls.email.invalid
+            ) {
+              <span class="field-error">Escribe un correo válido.</span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="card content-card">
+        <header class="content-card__head">
+          <div>
+            <h2>Pie de página</h2>
+            <p>Frase que aparece debajo del logo.</p>
+          </div>
+        </header>
+
+        <div class="form-grid" formGroupName="footer">
+          <div class="field span-2">
+            <label for="footer-description">Descripción</label>
+            <textarea
+              id="footer-description"
+              formControlName="description"
+              rows="2"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <div class="content-actions">
+        <a class="btn btn--secondary" routerLink="/web">Volver a Web</a>
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="saving()"
+        >
+          {{ saving() ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

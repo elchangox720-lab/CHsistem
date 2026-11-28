@@ -114,9 +114,11 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          WhatsApp: {{ site.whatsappLabel }}
+          WhatsApp: {{ content().contact.whatsappLabel }}
         </a>
-        <a [href]="'mailto:' + site.email">{{ site.email }}</a>
+        <a [href]="'mailto:' + content().contact.email">
+          {{ content().contact.email }}
+        </a>
       </div>
     </div>
 

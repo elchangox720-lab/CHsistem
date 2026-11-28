@@ -63,32 +63,33 @@
       <span class="hero-landing__glow" aria-hidden="true"></span>
 
       <div class="hero-landing__copy">
-        <span class="eyebrow">Diseño web para negocios reales</span>
+        <span class="eyebrow">{{ content().hero.eyebrow }}</span>
         <h1>
-          Tu negocio merece una web que
-          <span class="text-gold">trabaje por ti</span>.
+          {{ content().hero.title }}
+          <span class="text-gold">{{ content().hero.accent }}</span>.
         </h1>
         <p class="hero-landing__lead">
-          Creamos sitios modernos, rápidos y pensados para convertir visitas en
-          clientes. Diseño a medida, acompañamiento cercano y precios claros.
+          {{ content().hero.description }}
         </p>
 
         <div class="hero-landing__actions">
-          <a class="btn btn--primary" href="#planes">Ver planes</a>
+          <a class="btn btn--primary" href="#planes">
+            {{ content().hero.primaryCta }}
+          </a>
           <a
             class="btn btn--secondary"
             [href]="whatsappHref"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Hablar por WhatsApp
+            {{ content().hero.secondaryCta }}
           </a>
         </div>
 
         <ul class="hero-landing__points">
-          <li>Diseño a medida</li>
-          <li>100% adaptable</li>
-          <li>Trato directo</li>
+          @for (point of content().hero.points; track $index) {
+            <li>{{ point }}</li>
+          }
         </ul>
       </div>
 
@@ -152,19 +153,16 @@
 
     <section class="section" id="servicios">
       <div class="section__head">
-        <span class="eyebrow">Lo que hacemos</span>
+        <span class="eyebrow">{{ content().services.eyebrow }}</span>
         <h2>
-          Una presencia digital
-          <span class="text-gold">a tu altura</span>
+          {{ content().services.title }}
+          <span class="text-gold">{{ content().services.accent }}</span>
         </h2>
-        <p>
-          No se trata solo de tener una página: se trata de que represente tu
-          negocio y facilite que las personas te contacten.
-        </p>
+        <p>{{ content().services.description }}</p>
       </div>
 
       <div class="benefit-grid">
-        @for (benefit of benefits; track benefit.title; let i = $index) {
+        @for (benefit of content().benefits; track $index; let i = $index) {
           <article class="benefit-card">
             <span class="benefit-card__index">0{{ i + 1 }}</span>
             <h3>{{ benefit.title }}</h3>
@@ -177,19 +175,17 @@
     <section class="section" id="productos">
       <div class="catalog-teaser card card--pad">
         <div>
-          <span class="eyebrow">Catálogo tecnológico</span>
+          <span class="eyebrow">{{ content().catalog.eyebrow }}</span>
           <h2>
-            Equipos con
-            <span class="text-gold">características claras</span>
+            {{ content().catalog.title }}
+            <span class="text-gold">{{ content().catalog.accent }}</span>
           </h2>
-          <p>
-            Explora laptops, monitores y accesorios en una página dedicada,
-            filtra por marca o modelo y revisa sus especificaciones antes de
-            consultar.
-          </p>
+          <p>{{ content().catalog.description }}</p>
         </div>
         <div class="catalog-teaser__actions">
-          <a class="btn btn--primary" routerLink="/catalogo">Ver catálogo</a>
+          <a class="btn btn--primary" routerLink="/catalogo">
+            {{ content().catalog.cta }}
+          </a>
           <a
             class="btn btn--secondary"
             [href]="whatsappHref"
@@ -204,19 +200,16 @@
 
     <section class="section section--plans" id="planes">
       <div class="section__head">
-        <span class="eyebrow">Planes y precios</span>
+        <span class="eyebrow">{{ content().plans.eyebrow }}</span>
         <h2>
-          Elige el punto de partida
-          <span class="text-gold">de tu web</span>
+          {{ content().plans.title }}
+          <span class="text-gold">{{ content().plans.accent }}</span>
         </h2>
-        <p>
-          Opciones claras para diferentes etapas de tu negocio. Si no sabes cuál
-          elegir, conversamos y te orientamos sin compromiso.
-        </p>
+        <p>{{ content().plans.description }}</p>
       </div>
 
       <div class="plan-grid">
-        @for (plan of plans; track plan.name) {
+        @for (plan of content().planItems; track $index) {
           <article class="plan-card" [class.plan-card--featured]="plan.featured">
             @if (plan.featured) {
               <span class="plan-card__badge">Más elegido</span>
@@ -246,26 +239,21 @@
         }
       </div>
 
-      <p class="plans-note">
-        Dominio, hosting y servicios externos se cotizan por separado.
-      </p>
+      <p class="plans-note">{{ content().plansNote }}</p>
     </section>
 
     <section class="section" id="proceso">
       <div class="section__head">
-        <span class="eyebrow">Cómo trabajamos</span>
+        <span class="eyebrow">{{ content().process.eyebrow }}</span>
         <h2>
-          De la idea a tu web
-          <span class="text-gold">en cuatro pasos</span>
+          {{ content().process.title }}
+          <span class="text-gold">{{ content().process.accent }}</span>
         </h2>
-        <p>
-          Un proceso sencillo, con comunicación directa y sin sorpresas en el
-          camino.
-        </p>
+        <p>{{ content().process.description }}</p>
       </div>
 
       <ol class="process-grid">
-        @for (step of steps; track step.title; let i = $index) {
+        @for (step of content().steps; track $index; let i = $index) {
           <li class="process-step">
             <span class="process-step__number">0{{ i + 1 }}</span>
             <h3>{{ step.title }}</h3>
@@ -277,15 +265,12 @@
 
     <section class="section contact" id="contacto">
       <div class="contact__copy">
-        <span class="eyebrow">Hablemos</span>
+        <span class="eyebrow">{{ content().contact.eyebrow }}</span>
         <h2>
-          Cuéntanos qué necesitas y
-          <span class="text-gold">lo hacemos realidad</span>
+          {{ content().contact.title }}
+          <span class="text-gold">{{ content().contact.accent }}</span>
         </h2>
-        <p>
-          Escríbenos por WhatsApp o completa el formulario. Te respondemos con
-          una orientación clara y los siguientes pasos.
-        </p>
+        <p>{{ content().contact.description }}</p>
 
         <div class="contact__channels">
           <a
@@ -303,11 +288,14 @@
             </span>
             <span>
               <small>WhatsApp</small>
-              <strong>{{ site.whatsappLabel }}</strong>
+              <strong>{{ content().contact.whatsappLabel }}</strong>
             </span>
           </a>
 
-          <a class="contact-channel" [href]="'mailto:' + site.email">
+          <a
+            class="contact-channel"
+            [href]="'mailto:' + content().contact.email"
+          >
             <span class="contact-channel__icon">
               <svg
                 viewBox="0 0 24 24"
@@ -324,7 +312,7 @@
             </span>
             <span>
               <small>Correo</small>
-              <strong>{{ site.email }}</strong>
+              <strong>{{ content().contact.email }}</strong>
             </span>
           </a>
         </div>
@@ -366,7 +354,7 @@
         <div class="field">
           <label for="contact-plan">Plan de interés</label>
           <select id="contact-plan" formControlName="plan">
-            @for (plan of plans; track plan.name) {
+            @for (plan of content().planItems; track $index) {
               <option [value]="plan.name">{{ plan.name }}</option>
             }
             <option value="Aún no lo sé">Aún no lo sé</option>
@@ -414,7 +402,7 @@
             <span class="site-brand__tagline">{{ site.tagline }}</span>
           </span>
         </a>
-        <p>Sitios web para negocios que quieren dar el siguiente paso.</p>
+        <p>{{ content().footer.description }}</p>
       </div>
 
       <nav class="site-footer__nav" aria-label="Enlaces del pie">
@@ -431,9 +419,11 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          {{ site.whatsappLabel }}
+          {{ content().contact.whatsappLabel }}
         </a>
-        <a [href]="'mailto:' + site.email">{{ site.email }}</a>
+        <a [href]="'mailto:' + content().contact.email">
+          {{ content().contact.email }}
+        </a>
         <a routerLink="/login">Acceso al panel</a>
       </div>
     </div>

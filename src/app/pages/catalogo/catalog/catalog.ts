@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { apiErrorMessage } from '../../../core/error';
 import { PublicProduct, ProductSpec } from '../../../core/models';
 import { ProductsService } from '../../../core/products.service';
-import { SITE } from '../../../core/site';
+import { SiteContentService } from '../../../core/site-content.service';
 import { ModalComponent } from '../../../shared/modal';
 import { MoneyPipe } from '../../../shared/money.pipe';
 
@@ -14,8 +14,9 @@ import { MoneyPipe } from '../../../shared/money.pipe';
 })
 export class Catalog implements OnInit {
   private readonly productsService = inject(ProductsService);
+  private readonly siteContent = inject(SiteContentService);
 
-  protected readonly site = SITE;
+  protected readonly content = this.siteContent.content;
   protected readonly items = signal<PublicProduct[]>([]);
   protected readonly brands = signal<string[]>([]);
   protected readonly categories = signal<string[]>([]);
@@ -76,6 +77,7 @@ export class Catalog implements OnInit {
   );
 
   ngOnInit(): void {
+    this.siteContent.load().subscribe();
     this.load();
   }
 
@@ -161,6 +163,6 @@ export class Catalog implements OnInit {
       details ? ` (${details})` : ''
     }. ¿Está disponible?`;
 
-    return `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${this.content().contact.whatsapp}?text=${encodeURIComponent(text)}`;
   }
 }

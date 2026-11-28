@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -6,15 +6,9 @@ import {
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { SITE } from '../../core/site';
+import { SitePlan } from '../../core/site-content';
+import { SiteContentService } from '../../core/site-content.service';
 import { ToastService } from '../../core/toast.service';
-
-interface Plan {
-  name: string;
-  price: string;
-  tagline: string;
-  features: string[];
-  featured: boolean;
-}
 
 @Component({
   selector: 'app-landing',
@@ -22,95 +16,14 @@ interface Plan {
   templateUrl: './landing.html',
   styleUrl: './landing.css',
 })
-export class Landing {
+export class Landing implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly toast = inject(ToastService);
+  private readonly siteContent = inject(SiteContentService);
 
   protected readonly site = SITE;
   protected readonly year = new Date().getFullYear();
-  protected readonly whatsappHref = this.waLink(
-    'Hola CHsistems, quiero información sobre sus servicios web.'
-  );
-
-  protected readonly benefits = [
-    {
-      title: 'Diseño a medida',
-      text: 'Una imagen alineada a tu marca y a lo que quieres comunicar.',
-    },
-    {
-      title: '100% adaptable',
-      text: 'Se ve bien en celulares, tablets y pantallas de escritorio.',
-    },
-    {
-      title: 'SEO básico',
-      text: 'Bases sólidas para que te encuentren en los buscadores.',
-    },
-    {
-      title: 'Trato directo',
-      text: 'Acompañamiento cercano desde la idea hasta la publicación.',
-    },
-  ];
-
-  protected readonly plans: Plan[] = [
-    {
-      name: 'Web Emprendedor',
-      price: '$350.000',
-      tagline: 'Ideal para empezar con una presencia profesional.',
-      features: [
-        'Página de una sola sección larga',
-        'Adaptación a celulares',
-        'Botón de WhatsApp',
-        'Formulario de contacto',
-        'Diseño basado en plantilla',
-      ],
-      featured: false,
-    },
-    {
-      name: 'Web Empresarial',
-      price: '$650.000 – $900.000',
-      tagline: 'Para negocios que necesitan mostrar más y vender mejor.',
-      features: [
-        'Hasta 5 secciones',
-        'Inicio, nosotros, servicios y contacto',
-        'Galería de imágenes',
-        'Diseño adaptable',
-        'SEO básico',
-      ],
-      featured: true,
-    },
-    {
-      name: 'Tienda Virtual',
-      price: '$1.200.000 – $1.800.000',
-      tagline: 'Tu catálogo y tus ventas en línea, listos para crecer.',
-      features: [
-        'Catálogo de productos',
-        'Carrito de compras',
-        'Contacto por WhatsApp',
-        'Configuración inicial',
-        'Capacitación básica',
-      ],
-      featured: false,
-    },
-  ];
-
-  protected readonly steps = [
-    {
-      title: 'Conversamos',
-      text: 'Entendemos tu negocio, tus objetivos y lo que necesitas comunicar.',
-    },
-    {
-      title: 'Propuesta',
-      text: 'Definimos alcance, tiempos y precio antes de empezar.',
-    },
-    {
-      title: 'Diseño y desarrollo',
-      text: 'Construimos tu sitio y lo revisamos juntos paso a paso.',
-    },
-    {
-      title: 'Publicación',
-      text: 'Lanzamos, te capacitamos y quedamos disponibles para acompañarte.',
-    },
-  ];
+  protected readonly content = this.siteContent.content;
 
   protected readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -119,7 +32,17 @@ export class Landing {
     message: ['', [Validators.required, Validators.minLength(10)]],
   });
 
-  protected planHref(plan: Plan): string {
+  ngOnInit(): void {
+    this.siteContent.load().subscribe(() => this.syncSelectedPlan());
+  }
+
+  protected get whatsappHref(): string {
+    return this.waLink(
+      'Hola CHsistems, quiero información sobre sus servicios web.'
+    );
+  }
+
+  protected planHref(plan: SitePlan): string {
     return this.waLink(
       `Hola CHsistems, me interesa el plan ${plan.name} (${plan.price}). ¿Podemos conversar?`
     );
@@ -146,12 +69,21 @@ export class Landing {
     this.form.reset({
       name: '',
       email: '',
-      plan: 'Web Emprendedor',
+      plan: this.content().planItems[0]?.name ?? 'Web Emprendedor',
       message: '',
     });
   }
 
+  private syncSelectedPlan(): void {
+    const plans = this.content().planItems;
+    const current = this.form.controls.plan.value;
+
+    if (plans.length > 0 && !plans.some((plan) => plan.name === current)) {
+      this.form.controls.plan.setValue(plans[0].name);
+    }
+  }
+
   private waLink(text: string): string {
-    return `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${this.content().contact.whatsapp}?text=${encodeURIComponent(text)}`;
   }
 }

@@ -53,6 +53,13 @@ export const routes: Routes = [
           import('./pages/sale-new/sale-new').then((m) => m.SaleNew),
       },
       {
+        path: 'web/contenido',
+        loadComponent: () =>
+          import('./pages/web-content/web-content').then((m) => m.WebContent),
+        canActivate: [roleGuard],
+        data: { roles: ['admin'] },
+      },
+      {
         path: 'web',
         loadComponent: () =>
           import('./pages/web/web').then((m) => m.Web),

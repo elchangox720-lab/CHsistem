@@ -5,6 +5,7 @@
 .landing {
   position: relative;
   min-height: 100dvh;
+  overflow-x: clip;
 }
 
 .skip-link {
