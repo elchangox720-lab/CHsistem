@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /panel
+Disallow: /clientes
+Disallow: /productos
+Disallow: /inventario
+Disallow: /ventas
+Disallow: /web
+Disallow: /usuarios
+
+Sitemap: https://chsistem.vercel.app/sitemap.xml

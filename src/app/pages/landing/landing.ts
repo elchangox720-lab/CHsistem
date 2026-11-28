@@ -5,6 +5,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo.service';
+import { landingJsonLd } from '../../core/seo-data';
 import { SITE } from '../../core/site';
 import { SitePlan } from '../../core/site-content';
 import { SiteContentService } from '../../core/site-content.service';
@@ -20,6 +22,7 @@ export class Landing implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly toast = inject(ToastService);
   private readonly siteContent = inject(SiteContentService);
+  private readonly seo = inject(SeoService);
 
   protected readonly site = SITE;
   protected readonly year = new Date().getFullYear();
@@ -33,7 +36,10 @@ export class Landing implements OnInit {
   });
 
   ngOnInit(): void {
-    this.siteContent.load().subscribe(() => this.syncSelectedPlan());
+    this.siteContent.load().subscribe(() => {
+      this.syncSelectedPlan();
+      this.updateSeo();
+    });
   }
 
   protected get whatsappHref(): string {
@@ -71,6 +77,18 @@ export class Landing implements OnInit {
       email: '',
       plan: this.content().planItems[0]?.name ?? 'Web Emprendedor',
       message: '',
+    });
+  }
+
+  private updateSeo(): void {
+    const content = this.content();
+
+    this.seo.setPage({
+      title: `${content.hero.title} ${content.hero.accent} | ${SITE.name}`,
+      description: content.hero.description,
+      path: '/',
+      image: '/brand-logo.jpg',
+      jsonLd: landingJsonLd(content),
     });
   }
 

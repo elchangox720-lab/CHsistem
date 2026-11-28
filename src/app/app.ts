@@ -9,6 +9,8 @@ import {
 import { filter } from 'rxjs';
 import { AuthService } from './core/auth.service';
 import { Role } from './core/models';
+import { SeoService } from './core/seo.service';
+import { SITE } from './core/site';
 import { ToastService } from './core/toast.service';
 
 @Component({
@@ -20,6 +22,7 @@ import { ToastService } from './core/toast.service';
 export class App {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly seo = inject(SeoService);
 
   protected readonly auth = inject(AuthService);
   protected readonly toasts = this.toastService.toasts;
@@ -28,13 +31,33 @@ export class App {
   );
 
   constructor() {
+    this.applyPrivateSeo(this.router.url);
+
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd)
       )
       .subscribe(() => {
-        this.isPublicPage.set(this.isPublicUrl(this.router.url));
+        const url = this.router.url;
+        this.isPublicPage.set(this.isPublicUrl(url));
+        this.applyPrivateSeo(url);
       });
+  }
+
+  private applyPrivateSeo(url: string): void {
+    const path = url.split(/[?#]/)[0];
+
+    if (
+      path === '/' ||
+      path === '/catalogo' ||
+      path.startsWith('/catalogo/')
+    ) {
+      return;
+    }
+
+    this.seo.setNoindex(
+      path === '/login' ? `Iniciar sesión | ${SITE.name}` : `Panel | ${SITE.name}`
+    );
   }
 
   private isPublicUrl(url: string): boolean {

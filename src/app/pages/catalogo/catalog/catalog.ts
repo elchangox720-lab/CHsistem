@@ -2,6 +2,9 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { apiErrorMessage } from '../../../core/error';
 import { PublicProduct, ProductSpec } from '../../../core/models';
 import { ProductsService } from '../../../core/products.service';
+import { catalogJsonLd } from '../../../core/seo-data';
+import { SeoService } from '../../../core/seo.service';
+import { SITE } from '../../../core/site';
 import { SiteContentService } from '../../../core/site-content.service';
 import { ModalComponent } from '../../../shared/modal';
 import { MoneyPipe } from '../../../shared/money.pipe';
@@ -15,6 +18,7 @@ import { MoneyPipe } from '../../../shared/money.pipe';
 export class Catalog implements OnInit {
   private readonly productsService = inject(ProductsService);
   private readonly siteContent = inject(SiteContentService);
+  private readonly seo = inject(SeoService);
 
   protected readonly content = this.siteContent.content;
   protected readonly items = signal<PublicProduct[]>([]);
@@ -77,7 +81,7 @@ export class Catalog implements OnInit {
   );
 
   ngOnInit(): void {
-    this.siteContent.load().subscribe();
+    this.siteContent.load().subscribe(() => this.updateSeo(this.items()));
     this.load();
   }
 
@@ -91,11 +95,24 @@ export class Catalog implements OnInit {
         this.brands.set(response.brands);
         this.categories.set(response.categories);
         this.loading.set(false);
+        this.updateSeo(response.items);
       },
       error: (error) => {
         this.error.set(apiErrorMessage(error));
         this.loading.set(false);
       },
+    });
+  }
+
+  private updateSeo(items: PublicProduct[]): void {
+    const content = this.content();
+
+    this.seo.setPage({
+      title: `${content.catalog.title} ${content.catalog.accent} | ${SITE.name}`,
+      description: content.catalog.description,
+      path: '/catalogo',
+      image: '/brand-logo.jpg',
+      jsonLd: catalogJsonLd(content, items),
     });
   }
 
